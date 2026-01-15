@@ -318,7 +318,7 @@ class Picarx(object):
 if __name__ == "__main__":
     px = Picarx()
     atexit.register(px.shutdown_cleanup)
-    px.forward(20)
+    px.forward(25)
     time.sleep(3)
     px.set_dir_servo_angle(20)
     time.sleep(1)
