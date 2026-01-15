@@ -254,8 +254,8 @@ class Picarx(object):
                 self.set_motor_speed(1, 1*ack_inner_speed)
                 self.set_motor_speed(2, -ack_outer_speed) 
             else:
-                self.set_motor_speed(1, ack_inner_speed)
-                self.set_motor_speed(2, -1*ack_outer_speed)
+                self.set_motor_speed(1, ack_outer_speed)
+                self.set_motor_speed(2, -1*ack_inner_speed)
         else:
             self.set_motor_speed(1, speed)
             self.set_motor_speed(2, -1*speed)                  
