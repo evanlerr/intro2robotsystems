@@ -1,7 +1,7 @@
 import os
 import logging
 import atexit
-import numpy as np
+import math
 from logdecorator import log_on_start, log_on_end, log_on_error
 try:
     from robot_hat import Pin, ADC, PWM, Servo, fileDB
@@ -125,8 +125,8 @@ class Picarx(object):
     def ackermann_aproximation(self, speed):
         ''' calculate inner and outer wheel speed based on ackermann steering model'''
         steering = self.dir_current_angle
-
-        radius = self.L / np.tan(steering) # radius of rotation in mm
+        steering = math.radians(steering)
+        radius = self.L / math.tan(steering) # radius of rotation in mm
 
         angv = speed * radius
 
