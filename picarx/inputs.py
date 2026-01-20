@@ -6,11 +6,14 @@ px = Picarx()
 
 def j_turn():
     px.set_dir_servo_angle(-30)
-    px.backward(30)
+    px.forward(40)
     time.sleep(2)
     px.set_dir_servo_angle(30)
-    px.forward(30)
+    px.backward(40)
     time.sleep(2)
+    px.set_dir_servo_angle(0)
+    px.forward(40)
+    time.sleep(1)
     px.stop()
     px.set_dir_servo_angle(0)
 
