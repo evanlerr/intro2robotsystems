@@ -12,12 +12,15 @@ def j_turn():
     px.forward(30)
 
 def parallel_park():
-    px.forward(30)
-    time.sleep(1)
-    px.stop()
+    # px.forward(30)
+    # time.sleep(1)
+    # px.stop()
     px.backward(30)
     time.sleep(1)
     px.set_dir_servo_angle(30)
+    px.backward(30)
+    time.sleep(1)
+    px.set_dir_servo_angle(0)
     px.backward(30)
     time.sleep(1)
     px.set_dir_servo_angle(-30)
