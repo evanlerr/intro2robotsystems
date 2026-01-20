@@ -2,7 +2,7 @@
 from .basic import _Basic_class
 import time
 import threading
-#import pyaudio
+import pyaudio
 import os
 import struct
 import math
@@ -11,7 +11,7 @@ from .utils import enable_speaker, disable_speaker
 class Music(_Basic_class):
     """Play music, sound affect and note control"""
 
-    #fFORMAT = pyaudio.paInt16
+    FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 44100
 
@@ -123,10 +123,8 @@ class Music(_Basic_class):
         :rtype: int
         """
         if tempo == None and note_value == None:
-            return
             return self._tempo
         try:
-            return
             self._tempo = (tempo, note_value)
             self.beat_unit = 60.0 / tempo
             return self._tempo
@@ -321,10 +319,10 @@ class Music(_Basic_class):
         """
         Credit to: Aditya Shankar & Gringo Suave https://stackoverflow.com/a/53231212/14827323
         """
-        #p = pyaudio.PyAudio()
-        # frames = self.get_tone_data(freq, duration)
-        # stream = p.open(format=self.FORMAT, channels=self.CHANNELS,
-        #                 rate=self.RATE, output=True)
-        # stream.write(frames)
+        p = pyaudio.PyAudio()
+        frames = self.get_tone_data(freq, duration)
+        stream = p.open(format=self.FORMAT, channels=self.CHANNELS,
+                        rate=self.RATE, output=True)
+        stream.write(frames)
         # stream.stop_stream()
         # stream.close()

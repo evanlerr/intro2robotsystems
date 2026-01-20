@@ -225,15 +225,17 @@ class Picarx(object):
         current_angle = self.dir_current_angle
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
-            if abs_current_angle > self.DIR_MAX:
-                abs_current_angle = self.DIR_MAX
-            power_scale = (100 - abs_current_angle) / 100.0 
+            # if abs_current_angle > self.DIR_MAX:
+            #     abs_current_angle = self.DIR_MAX
+            # power_scale = (100 - abs_current_angle) / 100.0 
+            ack_inner_speed, ack_outer_speed = self.ackermann_aproximation(speed)
+            logging.debug(f"speed: {speed}, inner speed: {ack_inner_speed}, outer speed: {ack_outer_speed}")
             if (current_angle / abs_current_angle) > 0:
-                self.set_motor_speed(1, -1*speed)
-                self.set_motor_speed(2, speed * power_scale)
+                self.set_motor_speed(1, -1*ack_outer_speed)
+                self.set_motor_speed(2, ack_inner_speed)
             else:
-                self.set_motor_speed(1, -1*speed * power_scale)
-                self.set_motor_speed(2, speed )
+                self.set_motor_speed(1, -1*ack_inner_speed)
+                self.set_motor_speed(2, ack_outer_speed) 
         else:
             self.set_motor_speed(1, -1*speed)
             self.set_motor_speed(2, speed)  
