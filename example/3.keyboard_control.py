@@ -1,4 +1,4 @@
-from picarx import Picarx
+from picarx_improved import Picarx
 from time import sleep
 import readchar
 
