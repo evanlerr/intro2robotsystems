@@ -1,4 +1,5 @@
 import picarx_improved
+from picarx_improved import Picarx
 import time
 
 px = Picarx()
