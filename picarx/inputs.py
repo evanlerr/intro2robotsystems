@@ -1,18 +1,33 @@
 import picarx_improved
+import time
+
+px = Picarx()
 
 def j_turn():
-    picarx_improved.forward(50)  
-    picarx_improved.sleep(2)      
-    picarx_improved.stop()
+    px.backward(30)
+    px.set_dir_servo_angle(20)
+    px.forward(30)
+    px.set_dir_servo_angle(-20)
+    px.forward(30)
 
 def parallel_park():
-    picarx_improved.turn_left(50)  
-    picarx_improved.sleep(1.5)      
-    picarx_improved.forward(50)     
-    picarx_improved.sleep(2)        
-    picarx_improved.turn_right(50) 
-    picarx_improved.sleep(1.5)      
-    picarx_improved.stop()
+    px.forward(50)
+    time.sleep(1)
+    px.stop()
+    px.backward(30)
+    time.sleep(.5)
+    px.set_dir_servo_angle(30)
+    px.backward(30)
+    time.sleep(.5)
+    px.set_dir_servo_angle(-30)
+    px.backward(30)
+    time.sleep(.5)
+    px.stop()
+
+    
+
+
+
 
 
 
