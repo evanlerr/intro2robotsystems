@@ -5,8 +5,8 @@ import time
 px = Picarx()
 
 def j_turn():
-    px.backward(30)
     px.set_dir_servo_angle(-30)
+    px.backward(30)
     time.sleep(2)
     px.set_dir_servo_angle(30)
     px.forward(30)
