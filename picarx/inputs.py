@@ -6,10 +6,13 @@ px = Picarx()
 
 def j_turn():
     px.backward(30)
-    px.set_dir_servo_angle(20)
+    px.set_dir_servo_angle(-30)
+    time.sleep(2)
+    px.set_dir_servo_angle(30)
     px.forward(30)
-    px.set_dir_servo_angle(-20)
-    px.forward(30)
+    time.sleep(2)
+    px.stop()
+    px.set_dir_servo_angle(0)
 
 def parallel_park():
     # px.forward(30)
