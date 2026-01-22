@@ -2,7 +2,7 @@ import picarx_improved
 from motions import vector,k_turn, parallel_park,line_following
 import time
 
-px = picarx_improved.Picarx()
+#px = picarx_improved.Picarx()
 
 maneuvers = {
     "kl": k_turn,
