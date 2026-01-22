@@ -1,0 +1,110 @@
+import sys,os,picarx_improved
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from picarx_improved import Picarx
+#from sim_robot_hat import Greyscale_Module
+import time
+
+class Sensor(object):
+    def __init__(self,pins,sensor):
+        self.pins = pins
+        self.sensor = sensor
+
+    def readval(self):
+        self.valouts = self.sensor.read()
+        return self.valouts
+    
+class interpreter(object):
+    def __init__(self, dark,light,polarity):
+        self.dark = dark
+        self.light = light
+        self.polarity = polarity
+
+    def state(self, vals):
+        Lval = vals[0]
+        Cval = vals[1]
+        Rval = vals[2]
+        
+        Ldist = abs(Lval - self.dark)/(self.light - self.dark)
+        Cdist = abs(Cval - self.dark)/(self.light - self.dark)
+        Rdist = abs(Rval - self.dark)/(self.light - self.dark)
+
+        if self.polarity == "dark":
+            Ldist = 1 - Ldist
+            Cdist = 1 - Cdist
+            Rdist = 1 - Rdist
+        return (Ldist,Cdist,Rdist)
+        
+class controller(object):
+    def __init__(self, gain, sensor, interpreter):
+        self.gain = gain
+        self.sensor = sensor
+        self.interpreter = interpreter
+
+    def control_loop(self):
+        values = self.interpreter.state(self.sensor.readval())
+        print(f"output value: {values}")
+        Ldist = values[0]
+        Cdist = values[1]
+        Rdist = values[2]
+        turn = 0
+
+        if Ldist > Rdist:
+            turn = -1 * self.gain * (Ldist - Rdist)
+        else:
+            turn = self.gain * (Rdist - Ldist)
+
+        px.set_dir_servo_angle(turn)
+        #px.forward(30)
+
+px = Picarx()
+sense = Sensor(px.grayscale.pins,px.grayscale)
+interpret = interpreter(dark=200, light=800, polarity="dark")
+follow_controller = controller(30,sense,interpret)
+
+def vector(angle, speed):
+    px.set_dir_servo_angle(angle)
+    if speed >= 0:
+        px.forward(speed)
+    else:
+        px.backward(speed)
+    
+
+def k_turn(direction="left"):
+    if direction == "left":
+        x = -1
+    else:
+        x = 1
+    px.set_dir_servo_angle(-30*x)
+    px.forward(40)
+    time.sleep(2)
+    px.set_dir_servo_angle(30*x)
+    px.backward(40)
+    time.sleep(2)
+    px.set_dir_servo_angle(0)
+    px.forward(40)
+    time.sleep(1)
+    px.stop()
+    px.set_dir_servo_angle(0)
+
+def parallel_park():
+    # px.forward(30)
+    # time.sleep(1)
+    # px.stop()
+    px.backward(30)
+    time.sleep(1)
+    px.set_dir_servo_angle(30)
+    px.backward(30)
+    time.sleep(1)
+    px.set_dir_servo_angle(0)
+    px.backward(30)
+    time.sleep(1)
+    px.set_dir_servo_angle(-30)
+    px.backward(30)
+    time.sleep(1)
+    px.stop()
+    px.set_dir_servo_angle(0)
+
+def line_following():
+    while True:
+        follow_controller.control_loop()
+

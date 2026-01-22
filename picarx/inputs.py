@@ -1,55 +1,19 @@
 import picarx_improved
 from picarx_improved import Picarx
+from motions import vector,k_turn, parallel_park,line_following
 import time
 
 px = Picarx()
 
-def j_turn():
-    px.set_dir_servo_angle(-30)
-    px.forward(40)
-    time.sleep(2)
-    px.set_dir_servo_angle(30)
-    px.backward(40)
-    time.sleep(2)
-    px.set_dir_servo_angle(0)
-    px.forward(40)
-    time.sleep(1)
-    px.stop()
-    px.set_dir_servo_angle(0)
-
-def parallel_park():
-    # px.forward(30)
-    # time.sleep(1)
-    # px.stop()
-    px.backward(30)
-    time.sleep(1)
-    px.set_dir_servo_angle(30)
-    px.backward(30)
-    time.sleep(1)
-    px.set_dir_servo_angle(0)
-    px.backward(30)
-    time.sleep(1)
-    px.set_dir_servo_angle(-30)
-    px.backward(30)
-    time.sleep(1)
-    px.stop()
-    px.set_dir_servo_angle(0)
-
-    
-
-
-
-
-
-
-
 maneuvers = {
-    "j": j_turn,
-    "p": parallel_park
+    "kl": k_turn,
+    "k": k_turn,
+    "p": parallel_park,
+    "l": line_following
 }
 
 while True:
-    request = input("Enter command: (j for j turn, p for parallel park, q to quit)")
+    request = input("Enter command (q to quit): ")
 
     if request == "q":
         print("exiting...")
