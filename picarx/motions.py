@@ -54,7 +54,7 @@ class controller(object):
             turn = self.gain * (Rdist - Ldist)
 
         px.set_dir_servo_angle(turn)
-        #px.forward(30)
+        px.forward(30)
 
 px = Picarx()
 sense = Sensor(px.grayscale.pins,px.grayscale)
