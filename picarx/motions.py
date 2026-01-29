@@ -39,6 +39,10 @@ class controller(object):
         self.gain = gain
         self.sensor = sensor
         self.interpreter = interpreter
+        self.left_count = 0
+        self.right_count = 0
+        self.over_left = False
+        self.over_right = False
 
     def control_loop(self):
         values = self.interpreter.state(self.sensor.readval())
