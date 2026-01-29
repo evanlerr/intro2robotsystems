@@ -47,7 +47,7 @@ class controller(object):
 
     def control_loop(self):
         values = self.interpreter.state(self.sensor.readval())
-        print(f"output value: {values}")
+        print(f"output value: {values}, {self.over_left}, {self.over_right}, {self.time_over_line}")
         Ldist = values[0]
         Cdist = values[1]
         Rdist = values[2]

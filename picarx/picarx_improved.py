@@ -218,9 +218,9 @@ class Picarx(object):
         self.set_motor_speed(1, speed)
         self.set_motor_speed(2, speed)
 
-    @log_on_start(logging.DEBUG, "backward() called with {speed}")
+    #@log_on_start(logging.DEBUG, "backward() called with {speed}")
     @log_on_error(logging.DEBUG, "error in backward()")
-    @log_on_end(logging.DEBUG, "backward() ended successfully")
+    #@log_on_end(logging.DEBUG, "backward() ended successfully")
     def backward(self, speed):
         current_angle = self.dir_current_angle
         if current_angle != 0:
@@ -229,7 +229,7 @@ class Picarx(object):
             #     abs_current_angle = self.DIR_MAX
             # power_scale = (100 - abs_current_angle) / 100.0 
             ack_inner_speed, ack_outer_speed = self.ackermann_aproximation(speed)
-            logging.debug(f"speed: {speed}, inner speed: {ack_inner_speed}, outer speed: {ack_outer_speed}")
+            #logging.debug(f"speed: {speed}, inner speed: {ack_inner_speed}, outer speed: {ack_outer_speed}")
             if (current_angle / abs_current_angle) > 0:
                 self.set_motor_speed(1, -1*ack_outer_speed)
                 self.set_motor_speed(2, ack_inner_speed)
@@ -240,9 +240,9 @@ class Picarx(object):
             self.set_motor_speed(1, -1*speed)
             self.set_motor_speed(2, speed)  
 
-    @log_on_start(logging.DEBUG, "forward() called with {speed}")
+    #@log_on_start(logging.DEBUG, "forward() called with {speed}")
     @log_on_error(logging.DEBUG, "error in forward()")
-    @log_on_end(logging.DEBUG, "forward() ended successfully")
+    #@log_on_end(logging.DEBUG, "forward() ended successfully")
     def forward(self, speed):
         current_angle = self.dir_current_angle
         if current_angle != 0:
@@ -251,7 +251,7 @@ class Picarx(object):
             #     abs_current_angle = self.DIR_MAX
             # power_scale = (100 - abs_current_angle) / 100.0
             ack_inner_speed, ack_outer_speed = self.ackermann_aproximation(speed)
-            logging.debug(f"speed: {speed}, inner speed: {ack_inner_speed}, outer speed: {ack_outer_speed}")
+            #logging.debug(f"speed: {speed}, inner speed: {ack_inner_speed}, outer speed: {ack_outer_speed}")
             if (current_angle / abs_current_angle) > 0:
                 self.set_motor_speed(1, 1*ack_outer_speed)
                 self.set_motor_speed(2, -ack_inner_speed) 
