@@ -64,8 +64,6 @@ class controller(object):
             self.over_left = False
             self.time_over_line = 0
 
-        self.left_count = 0
-        self.right_count = 0
         CONFIRM = 3
 
         if left_on_line:
