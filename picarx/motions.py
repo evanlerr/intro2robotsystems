@@ -48,14 +48,38 @@ class controller(object):
         Rdist = values[2]
         turn = 0
 
+        left_on_line = Ldist > 0.8
+        right_on_line = Rdist > 0.8
+
+        self.left_count = 0
+        self.right_count = 0
+        CONFIRM = 3
+
+        if left_on_line:
+            self.left_count += 1
+        else:
+            self.left_count = 0
+
+        if right_on_line:
+            self.right_count += 1
+        else:
+            self.right_count = 0
+
+        if not (self.over_left or self.over_right):
+            if self.left_count >= CONFIRM:
+                self.over_left = True
+            elif self.right_count >= CONFIRM:
+                self.over_right = True
+
+
         if Ldist > Rdist:
             turn = -1 * self.gain * (Ldist - Rdist)
         else:
             turn = self.gain * (Rdist - Ldist)
 
-        if Cdist == Ldist:
+        if self.over_left:
             turn = 15
-        if Cdist == Rdist:
+        if self.over_right:
             turn = -15
 
         px.set_dir_servo_angle(turn)
