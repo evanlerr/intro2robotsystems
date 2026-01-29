@@ -99,8 +99,8 @@ class controller(object):
             turn = -30
 
 
-        if Cdist < 0.2 and self.time_over_line > 3:
-            px.set_dir_servo_angle(-turn)
+        if Cdist < 0.2 and self.time_over_line > 25:
+            px.set_dir_servo_angle(turn)
             px.backward(20)
             time.sleep(.4)
         else:
