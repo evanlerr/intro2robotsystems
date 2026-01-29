@@ -64,7 +64,7 @@ class controller(object):
             self.over_left = False
             self.time_over_line = 0
 
-        CONFIRM = 3
+        CONFIRM = 20
 
         if left_on_line:
             self.left_count += 1
