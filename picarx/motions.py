@@ -87,7 +87,12 @@ class controller(object):
             turn = -30
 
         px.set_dir_servo_angle(turn)
-        px.forward(20)
+        if Cdist < 0.2 and self.over_left and self.over_right:
+            px.backward(20)
+            time.sleep(.1)
+        else:
+            px.forward(20)
+            time.sleep(.05)
 
 px = Picarx()
 sense = Sensor(px.grayscale.pins,px.grayscale)
