@@ -94,9 +94,9 @@ class controller(object):
             turn = self.gain * (Rdist - Ldist)
 
         if self.over_left:
-            turn = 30
-        if self.over_right:
             turn = -30
+        if self.over_right:
+            turn = 30
 
 
         if Cdist < 0.2 and self.time_over_line > 25:
