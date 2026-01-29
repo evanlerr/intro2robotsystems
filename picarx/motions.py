@@ -70,9 +70,9 @@ class controller(object):
             self.right_count = 0
 
         if not (self.over_left or self.over_right):
-            if self.left_count >= CONFIRM:
+            if self.left_count >= CONFIRM and not self.over_right:
                 self.over_left = True
-            elif self.right_count >= CONFIRM:
+            elif self.right_count >= CONFIRM and not self.over_left:
                 self.over_right = True
 
 
