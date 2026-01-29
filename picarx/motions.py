@@ -53,6 +53,11 @@ class controller(object):
         else:
             turn = self.gain * (Rdist - Ldist)
 
+        if Cdist == Ldist:
+            turn = 15
+        if Cdist == Rdist:
+            turn = -15
+
         px.set_dir_servo_angle(turn)
         px.forward(30)
 
