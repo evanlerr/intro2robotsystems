@@ -82,9 +82,9 @@ class controller(object):
             turn = self.gain * (Rdist - Ldist)
 
         if self.over_left:
-            turn = 15
+            turn = 30
         if self.over_right:
-            turn = -15
+            turn = -30
 
         px.set_dir_servo_angle(turn)
         px.forward(20)
@@ -138,6 +138,6 @@ def parallel_park():
     px.set_dir_servo_angle(0)
 
 def line_following():
-    while True:
+    while not break_condition():
         follow_controller.control_loop()
 
