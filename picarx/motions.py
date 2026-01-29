@@ -138,6 +138,12 @@ def parallel_park():
     px.set_dir_servo_angle(0)
 
 def line_following():
-    while True:
-        follow_controller.control_loop()
+    try:
+        while True:
+            follow_controller.control_loop()
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt: stop and exit")
+    finally:
+        px.stop()
+        print("stop and exit")
 
