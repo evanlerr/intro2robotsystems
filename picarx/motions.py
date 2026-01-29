@@ -138,6 +138,6 @@ def parallel_park():
     px.set_dir_servo_angle(0)
 
 def line_following():
-    while not break_condition():
+    while True:
         follow_controller.control_loop()
 
