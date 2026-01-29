@@ -43,6 +43,7 @@ class controller(object):
         self.right_count = 0
         self.over_left = False
         self.over_right = False
+        self.time_over_line = 0
 
     def control_loop(self):
         values = self.interpreter.state(self.sensor.readval())
@@ -53,7 +54,15 @@ class controller(object):
         turn = 0
 
         left_on_line = Ldist > 0.8
+        if left_on_line:
+            print("Left sensor on line")
+            self.over_right = False
+            self.time_over_line = 0
         right_on_line = Rdist > 0.8
+        if right_on_line:
+            print("Right sensor on line")
+            self.over_left = False
+            self.time_over_line = 0
 
         self.left_count = 0
         self.right_count = 0
@@ -69,12 +78,17 @@ class controller(object):
         else:
             self.right_count = 0
 
+        
+
         if not (self.over_left or self.over_right):
             if self.left_count >= CONFIRM and not self.over_right:
                 self.over_left = True
             elif self.right_count >= CONFIRM and not self.over_left:
                 self.over_right = True
 
+
+        if self.over_left or self.over_right:
+            self.time_over_line += 1
 
         if Ldist > Rdist:
             turn = -1 * self.gain * (Ldist - Rdist)
@@ -87,7 +101,7 @@ class controller(object):
             turn = -30
 
         px.set_dir_servo_angle(turn)
-        if Cdist < 0.2 and self.over_left and self.over_right:
+        if Cdist < 0.2 and self.time_over_line > 3:
             px.backward(20)
             time.sleep(.1)
         else:
