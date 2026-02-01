@@ -31,7 +31,7 @@ while True:
             angle = int(request[2:4])
         elif request[1] == "r":
             angle = -int(request[2:4])
-        speed = int(request[4:])
+        speed = -int(request[4:])
         vector(angle, speed)
         continue
 

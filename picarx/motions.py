@@ -118,7 +118,7 @@ def vector(angle, speed):
     if speed >= 0:
         px.forward(speed)
     else:
-        px.backward(speed)
+        px.backward(-speed)
     time.sleep(1)
     px.stop()
     
