@@ -142,7 +142,7 @@ px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale)
 sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
-interpret_table = interpreter(dark=482, light=490, polarity="dark")
+interpret_table = interpreter(dark=478, light=490, polarity="dark")
 gsfollow_controller = controller(30,sensegs,interpret)
 clfollow_controller = controller(30,sensevis,interpret_table)
 
@@ -206,7 +206,7 @@ def cameraline_following():
     px.set_cam_tilt_angle(-30)
     try:
         while True:
-            clfollow_controller.control_loop(100)
+            clfollow_controller.control_loop(50)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
