@@ -74,9 +74,10 @@ class controller(object):
         self.over_right = False
         self.time_over_line = 0
 
-    def control_loop(self):
+    def control_loop(self,gain):
         values = self.interpreter.state(self.sensor.readval())
         print(f"raw vals: {self.sensor.readval()},output value: {values}, {self.over_left}, {self.over_right}, {self.time_over_line}")
+        self.gain = gain
         Ldist = values[0]
         Cdist = values[1]
         Rdist = values[2]
@@ -193,7 +194,7 @@ def parallel_park():
 def gsline_following():
     try:
         while True:
-            gsfollow_controller.control_loop()
+            gsfollow_controller.control_loop(1)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
@@ -205,7 +206,7 @@ def cameraline_following():
     px.set_cam_tilt_angle(-30)
     try:
         while True:
-            clfollow_controller.control_loop()
+            clfollow_controller.control_loop(10)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
