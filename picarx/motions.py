@@ -34,9 +34,9 @@ class DigiSensor(object):
         center_region = gray[240, 320//2 - center_size//2 : 320//2 + center_size//2]
         left_region = gray[240, 0+40: 320//2 - center_size//2]
         right_region = gray[240, 320//2 + center_size//2 : 320-40]
-        left_avg = int(left_region.mean())
-        center_avg = int(center_region.mean())
-        right_avg = int(right_region.mean())
+        left_avg = int(left_region.mean()*1000/255)
+        center_avg = int(center_region.mean()*1000/255)
+        right_avg = int(right_region.mean()*1000/255)
         return (left_avg, center_avg, right_avg)
 
 
