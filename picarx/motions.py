@@ -17,7 +17,10 @@ class Sensor(object):
 class DigiSensor(object):
     def __init__(self):
         self.picam2 = Picamera2()
-        config = self.picam2.create_still_configuration(main={"size": (320, 240)}, format="YUV420")
+        config = self.picam2.create_still_configuration(main={
+            "size": (320, 240), 
+            "format": "YUV420"
+            })
         self.picam2.configure(config)
         self.picam2.start()
         self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 10000, "AnalogueGain": 1.0})
