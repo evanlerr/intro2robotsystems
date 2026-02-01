@@ -206,7 +206,7 @@ def cameraline_following():
     px.set_cam_tilt_angle(-30)
     try:
         while True:
-            clfollow_controller.control_loop(300)
+            clfollow_controller.control_loop(100)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
