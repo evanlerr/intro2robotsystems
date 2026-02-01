@@ -30,7 +30,7 @@ class DigiSensor(object):
         frame = self.picam2.capture_array()
         gray = frame#$[:, :, 0]  # Y channel
 
-        center_size = 65
+        center_size = 100
         center_region = gray[240, 320//2 - center_size//2 : 320//2 + center_size//2]
         left_region = gray[240, 0+40: 320//2 - center_size//2]
         right_region = gray[240, 320//2 + center_size//2 : 320-40]
