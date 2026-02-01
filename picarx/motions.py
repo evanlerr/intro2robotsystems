@@ -1,6 +1,7 @@
 import sys,os,picarx_improved
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from picarx_improved import Picarx
+from picamera2 import Picamera2, Preview
 #from sim_robot_hat import Greyscale_Module
 import time
 
@@ -12,6 +13,31 @@ class Sensor(object):
     def readval(self):
         self.valouts = self.sensor.read()
         return self.valouts
+    
+class DigiSensor(object):
+    def __init__(self):
+        self.picam2 = Picamera2()
+        config = self.picam2.create_still_configuration(main={"size": (320, 240)}, format="YUV420")
+        self.picam2.configure(config)
+        self.picam2.start()
+        self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 10000, "AnalogueGain": 1.0})
+        time.sleep(2)  # Allow camera to warm up
+
+    def readval(self):
+        frame = self.picam2.capture_array()
+        gray = frame[:, :, 0]  # Y channel
+
+        center_size = 65
+        center_region = gray[240, 320//2 - center_size//2 : 320//2 + center_size//2]
+        left_region = gray[240, 0+40: 320//2 - center_size//2]
+        right_region = gray[240, 320//2 + center_size//2 : 320-40]
+        left_avg = int(left_region.mean())
+        center_avg = int(center_region.mean())
+        right_avg = int(right_region.mean())
+        return (left_avg, center_avg, right_avg)
+
+
+
     
 class interpreter(object):
     def __init__(self, dark,light,polarity):
@@ -109,9 +135,11 @@ class controller(object):
             time.sleep(.05)
 
 px = Picarx()
-sense = Sensor(px.grayscale.pins,px.grayscale)
+sensegs = Sensor(px.grayscale.pins,px.grayscale)
+sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
-follow_controller = controller(30,sense,interpret)
+gsfollow_controller = controller(30,sensegs,interpret)
+clfollow_controller = controller(30,sensevis,interpret)
 
 def vector(angle, speed):
     px.set_dir_servo_angle(angle)
@@ -161,7 +189,7 @@ def parallel_park():
 def gsline_following():
     try:
         while True:
-            follow_controller.control_loop()
+            gsfollow_controller.control_loop()
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
@@ -171,6 +199,11 @@ def gsline_following():
 def cameraline_following():
     px.set_cam_pan_angle(0)
     px.set_cam_tilt_angle(-30)
-    time.sleep(1)
-    px.set_cam_tilt_angle(-40)
-    time.sleep(1)
+    try:
+        while True:
+            clfollow_controller.control_loop()
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt: stop and exit")
+    finally:
+        px.stop()
+        print("stop and exit")
