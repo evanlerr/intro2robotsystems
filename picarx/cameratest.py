@@ -1,9 +1,12 @@
-from picamera2 import Picamera2, Preview
+from picamera2 import Picamera2
 import time
+
 picam2 = Picamera2()
-camera_config = picam2.create_preview_configuration()
-picam2.configure(camera_config)
-picam2.start_preview(Preview.QTGL)
+picam2.start_preview()   # uses Qt preview window
 picam2.start()
-time.sleep(10)
-picam2.capture_file("test.jpg")
+
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    picam2.stop()
