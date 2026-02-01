@@ -28,7 +28,7 @@ class DigiSensor(object):
 
     def readval(self):
         frame = self.picam2.capture_array()
-        gray = frame[:, :, 0]  # Y channel
+        gray = frame#$[:, :, 0]  # Y channel
 
         center_size = 65
         center_region = gray[240, 320//2 - center_size//2 : 320//2 + center_size//2]
