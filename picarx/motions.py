@@ -141,8 +141,9 @@ px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale)
 sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
+interpret_table = interpreter(dark=400, light=600, polarity="dark")
 gsfollow_controller = controller(30,sensegs,interpret)
-clfollow_controller = controller(30,sensevis,interpret)
+clfollow_controller = controller(30,sensevis,interpret_table)
 
 def vector(angle, speed):
     px.set_dir_servo_angle(angle)
