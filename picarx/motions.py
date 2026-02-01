@@ -119,6 +119,8 @@ def vector(angle, speed):
         px.forward(speed)
     else:
         px.backward(speed)
+    time.sleep(1)
+    px.stop()
     
 
 def k_turn(direction="left"):
