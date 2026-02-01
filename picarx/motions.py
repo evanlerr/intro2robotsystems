@@ -170,7 +170,7 @@ def gsline_following():
 
 def cameraline_following():
     px.set_cam_pan_angle(0)
-    px.set_cam_tilt_angle(-15)
+    px.set_cam_tilt_angle(-30)
     time.sleep(1)
-    px.set_cam_tilt_angle(15)
+    px.set_cam_tilt_angle(-40)
     time.sleep(1)
