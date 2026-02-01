@@ -18,6 +18,24 @@ while True:
         print("exiting...")
         break
 
+    if request[0] == "f":
+        if request[1] == "l":
+            angle = request[2:4]
+        elif request[1] == "r":
+            angle = request[2:4]
+        speed = int(request[4:])
+        vector(f"-{angle}", speed)
+        continue
+    if request[0] == "b":
+        if request[1] == "l":
+            angle = request[2:4]
+        elif request[1] == "r":
+            angle = request[2:4]
+        speed = int(request[4:])
+        vector(f"-{angle}", speed)
+        continue
+
+
     if request in maneuvers:
         maneuvers[request]()
     else:
