@@ -158,7 +158,7 @@ def parallel_park():
     px.stop()
     px.set_dir_servo_angle(0)
 
-def line_following():
+def gsline_following():
     try:
         while True:
             follow_controller.control_loop()
@@ -168,3 +168,9 @@ def line_following():
         px.stop()
         print("stop and exit")
 
+def cameraline_following():
+    px.set_cam_pan_angle(0)
+    px.set_cam_tilt_angle(-15)
+    time.sleep(1)
+    px.set_cam_tilt_angle(15)
+    time.sleep(1)
