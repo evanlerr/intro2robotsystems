@@ -153,7 +153,7 @@ px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale)
 sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
-interpret_table = interpreter(dark=800, light=1000, polarity="dark") # todo - add a threshold to make the image binary
+interpret_table = interpreter(dark=700, light=1050, polarity="dark") # todo - add a threshold to make the image binary
 gsfollow_controller = controller(30,sensegs,interpret)
 clfollow_controller = controller(30,sensevis,interpret_table)
 
