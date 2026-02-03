@@ -27,26 +27,49 @@ class DigiSensor(object):
         time.sleep(2)  # Allow camera to warm up
 
     def readval(self):
-        frame = self.picam2.capture_array("main")  # YUV420 → 2D uint8
-        gray = frame  # already grayscale, 0–255
+        # Capture image and ensure a single-channel grayscale image
+        frame = self.picam2.capture_array("main")
+        if frame is None:
+            return 0, 0, 0
+        # If frame has multiple channels, convert to grayscale
+        if len(frame.shape) == 3 and frame.shape[2] in (3, 4):
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = frame
 
-        threshold_value = 100
-        _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY_INV)
+        # Use Otsu to pick a good threshold automatically and invert so the line is white
+        try:
+            _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        except Exception:
+            # Fallback to a fixed threshold if Otsu fails
+            _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
 
-        h, w = thresh.shape
-        rows = slice(h-10, h)
-        center_size = 70
+        h, w = thresh.shape[:2]
+        rows = slice(max(0, h-20), h)  # use last 20 rows for robustness
+        center_size = max(20, w // 5)
         cx = w // 2
 
-        #band = 10
-        #rows = thresh[row-band : row+band, :]
+        # Safely compute left/center/right regions with bounds checks
+        c1 = max(0, cx - center_size // 2)
+        c2 = min(w, cx + center_size // 2)
+        l1 = max(0, c1 - center_size)
+        l2 = c1
+        r1 = c2
+        r2 = min(w, c2 + center_size)
 
-        center_region = thresh[rows, cx - center_size//2 : cx + center_size//2]
-        left_region   = thresh[rows, cx - center_size//2 - 100 : cx - center_size//2]
-        right_region  = thresh[rows, cx + center_size//2 : cx + center_size//2 +100]
-        left_avg   = int(left_region.mean())
-        center_avg = int(center_region.mean())
-        right_avg  = int(right_region.mean())
+        center_region = thresh[rows, c1:c2]
+        left_region = thresh[rows, l1:l2]
+        right_region = thresh[rows, r1:r2]
+
+        # Handle empty slices
+        def safe_mean(arr):
+            if arr.size == 0:
+                return 0
+            return int(arr.mean())
+
+        left_avg = safe_mean(left_region)
+        center_avg = safe_mean(center_region)
+        right_avg = safe_mean(right_region)
         return left_avg, center_avg, right_avg
 
 
@@ -86,8 +109,9 @@ class controller(object):
         self.time_over_line = 0
 
     def control_loop(self,gain):
-        values = self.interpreter.state(self.sensor.readval())
-        print(f"raw vals: {self.sensor.readval()},output value: {values}, {self.over_left}, {self.over_right}, {self.time_over_line}")
+        raw_vals = self.sensor.readval()
+        values = self.interpreter.state(raw_vals)
+        print(f"raw vals: {raw_vals}, output value: {values}, {self.over_left}, {self.over_right}, {self.time_over_line}")
         self.gain = gain
         Ldist = values[0]
         Cdist = values[1]
@@ -153,7 +177,8 @@ px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale)
 sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
-interpret_table = interpreter(dark=700, light=1050, polarity="dark") # todo - add a threshold to make the image binary
+# Camera produces 0-255 pixel values after thresholding; the line is bright (white) after THRESH_BINARY_INV
+interpret_table = interpreter(dark=0, light=255, polarity="light") # camera values are 0-255, polarity 'light' treats bright as on-line
 gsfollow_controller = controller(30,sensegs,interpret)
 clfollow_controller = controller(30,sensevis,interpret_table)
 
