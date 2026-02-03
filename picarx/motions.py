@@ -44,9 +44,9 @@ class DigiSensor(object):
         center_region = thresh[rows, cx - center_size//2 : cx + center_size//2]
         left_region   = thresh[rows, cx - center_size//2 - 100 : cx - center_size//2]
         right_region  = thresh[rows, cx + center_size//2 : cx + center_size//2 +100]
-        left_avg   = int(left_region.mean()   * 1000 / 255)
-        center_avg = int(center_region.mean() * 1000 / 255)
-        right_avg  = int(right_region.mean()  * 1000 / 255)
+        left_avg   = int(left_region.mean())
+        center_avg = int(center_region.mean())
+        right_avg  = int(right_region.mean())
         return left_avg, center_avg, right_avg
 
 
