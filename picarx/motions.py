@@ -30,7 +30,7 @@ class DigiSensor(object):
         frame = self.picam2.capture_array("main")  # YUV420 → 2D uint8
         gray = frame  # already grayscale, 0–255
 
-        threshold_value = 140
+        threshold_value = 155
         _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
 
         h, w = thresh.shape
