@@ -34,7 +34,7 @@ class DigiSensor(object):
         _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
 
         h, w = thresh.shape
-        rows = slice(3*h // 4, h)
+        rows = slice(7*h // 8, h)
         center_size = 70
         cx = w // 2
 
