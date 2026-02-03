@@ -1,4 +1,4 @@
-import sys,os,picarx_improved
+import sys,os,picarx_improved,cv2
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from picarx_improved import Picarx
 from picamera2 import Picamera2, Preview
@@ -30,10 +30,14 @@ class DigiSensor(object):
         frame = self.picam2.capture_array()
         gray = frame#$[:, :, 0]  # Y channel
 
+        threshold_value = 128
+
+        ret, thresh1 = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
+
         center_size = 100
-        center_region = gray[240, 320//2 - center_size//2 : 320//2 + center_size//2]
-        left_region = gray[240, 0+40: 320//2 - center_size//2]
-        right_region = gray[240, 320//2 + center_size//2 : 320-40]
+        center_region = thresh1[240, 320//2 - center_size//2 : 320//2 + center_size//2]
+        left_region = thresh1[240, 0+40: 320//2 - center_size//2]
+        right_region = thresh1[240, 320//2 + center_size//2 : 320-40]
         left_avg = int(left_region.mean()*1000/255)
         center_avg = int(center_region.mean()*1000/255)
         right_avg = int(right_region.mean()*1000/255)
@@ -142,7 +146,7 @@ px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale)
 sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
-interpret_table = interpreter(dark=478, light=490, polarity="dark")
+interpret_table = interpreter(dark=478, light=490, polarity="dark") # todo - add a threshold to make the image binary
 gsfollow_controller = controller(30,sensegs,interpret)
 clfollow_controller = controller(30,sensevis,interpret_table)
 
@@ -212,3 +216,11 @@ def cameraline_following():
     finally:
         px.stop()
         print("stop and exit")
+
+
+def cameraline_calibrate():
+    px.set_cam_pan_angle(0)
+    px.set_cam_tilt_angle(-30)
+    time.sleep(2)
+    vals = sensevis.readval()
+    print(f"Camera line following calibration values: {vals}")

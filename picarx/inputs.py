@@ -1,5 +1,5 @@
 import picarx_improved
-from motions import vector,k_turn, parallel_park,gsline_following,cameraline_following
+from motions import vector,k_turn, parallel_park,gsline_following,cameraline_following,cameraline_calibrate
 import time
 
 #px = picarx_improved.Picarx()
@@ -9,7 +9,8 @@ maneuvers = {
     "k": k_turn,
     "p": parallel_park,
     "gl": gsline_following,
-    "cl": cameraline_following
+    "cl": cameraline_following,
+    "ccal": cameraline_calibrate
 
 }
 
