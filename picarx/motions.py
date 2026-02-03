@@ -38,12 +38,12 @@ class DigiSensor(object):
         center_size = 100
         cx = w // 2
 
-        band = 10
-        rows = thresh[row-band : row+band, :]
+        #band = 10
+        #rows = thresh[row-band : row+band, :]
 
-        center_region = rows[:, cx - center_size//2 : cx + center_size//2]
-        left_region   = rows[:, 40 : cx - center_size//2]
-        right_region  = rows[:, cx + center_size//2 : w - 40]
+        center_region = thresh[row, cx - center_size//2 : cx + center_size//2]
+        left_region   = thresh[row, 40 : cx - center_size//2]
+        right_region  = thresh[row, cx + center_size//2 : w - 40]
         left_avg   = int(left_region.mean()   * 1000 / 255)
         center_avg = int(center_region.mean() * 1000 / 255)
         right_avg  = int(right_region.mean()  * 1000 / 255)
