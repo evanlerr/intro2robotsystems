@@ -31,10 +31,10 @@ class DigiSensor(object):
         gray = frame  # already grayscale, 0–255
 
         threshold_value = 140
-        _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY_INV)
 
         h, w = thresh.shape
-        rows = slice(1*h // 8, h)
+        rows = slice(h-30, h)
         center_size = 70
         cx = w // 2
 
