@@ -26,22 +26,26 @@ class DigiSensor(object):
         self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 10000, "AnalogueGain": 1.0})
         time.sleep(2)  # Allow camera to warm up
 
-    def readval(self):
-        frame = self.picam2.capture_array()
-        gray = frame#$[:, :, 0]  # Y channel
+def readval(self):
+    frame = self.picam2.capture_array("main")  # YUV420 → 2D uint8
+    gray = frame  # already grayscale, 0–255
 
-        threshold_value = 128
+    threshold_value = 128
+    _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
 
-        ret, thresh1 = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
+    h, w = thresh.shape
+    row = h -2               # middle row
+    center_size = 100
+    cx = w // 2
 
-        center_size = 100
-        center_region = thresh1[239, 320//2 - center_size//2 : (320//2 -1) + center_size//2]
-        left_region = thresh1[239, 0+40: (320//2 -1) - center_size//2]
-        right_region = thresh1[239, 320//2 + center_size//2 : 319-40]
-        left_avg = int(left_region.mean()*1000/255)
-        center_avg = int(center_region.mean()*1000/255)
-        right_avg = int(right_region.mean()*1000/255)
-        return (left_avg, center_avg, right_avg)
+    center_region = thresh[row, cx - center_size//2 : cx + center_size//2]
+    left_region   = thresh[row, 40 : cx - center_size//2]
+    right_region  = thresh[row, cx + center_size//2 : w - 40]
+    left_avg   = int(left_region.mean()   * 1000 / 255)
+    center_avg = int(center_region.mean() * 1000 / 255)
+    right_avg  = int(right_region.mean()  * 1000 / 255)
+    return left_avg, center_avg, right_avg
+
 
 
 
