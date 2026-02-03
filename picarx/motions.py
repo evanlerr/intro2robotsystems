@@ -35,9 +35,9 @@ class DigiSensor(object):
         ret, thresh1 = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
 
         center_size = 100
-        center_region = thresh1[240, 320//2 - center_size//2 : 320//2 + center_size//2]
-        left_region = thresh1[240, 0+40: 320//2 - center_size//2]
-        right_region = thresh1[240, 320//2 + center_size//2 : 320-40]
+        center_region = thresh1[239, 320//2 - center_size//2 : (320//2 -1) + center_size//2]
+        left_region = thresh1[239, 0+40: (320//2 -1) - center_size//2]
+        right_region = thresh1[239, 320//2 + center_size//2 : 319-40]
         left_avg = int(left_region.mean()*1000/255)
         center_avg = int(center_region.mean()*1000/255)
         right_avg = int(right_region.mean()*1000/255)
