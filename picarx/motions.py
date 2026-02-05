@@ -23,7 +23,8 @@ class DigiSensor(object):
             })
         self.picam2.configure(config)
         self.picam2.start()
-        self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
+        #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
+        self.picam2.set_controls({"AeEnable": True, "AwbEnable": False})
         time.sleep(2)  # Allow camera to warm up
 
     def readval(self):
