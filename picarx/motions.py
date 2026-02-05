@@ -102,12 +102,13 @@ class controller(object):
         Rdist = values[2]
         turn = 0
 
-        left_on_line = Ldist > 0.8
+        left_on_line  = (Ldist > 0.8) and (Ldist > Rdist)
+        right_on_line = (Rdist > 0.8) and (Rdist > Ldist)
+
         if left_on_line:
             print("Left sensor on line")
             self.over_right = False
             self.time_over_line = 0
-        right_on_line = Rdist > 0.8
         if right_on_line:
             print("Right sensor on line")
             self.over_left = False
