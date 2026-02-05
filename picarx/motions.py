@@ -151,10 +151,12 @@ class controller(object):
 
         if Cdist < 0.2 and self.time_over_line > 25:
             px.set_dir_servo_angle(-turn)
+            px.set_cam_pan_angle(-turn)
             px.backward(20)
             time.sleep(.4)
         else:
             px.set_dir_servo_angle(turn)
+            px.set_cam_pan_angle(turn)
             px.forward(20)
             time.sleep(.05)
 
