@@ -48,7 +48,12 @@ class DigiSensor(object):
         left_avg   = int(left_region.mean())
         center_avg = int(center_region.mean())
         right_avg  = int(right_region.mean())
+        cv2.imshow("gray", gray)
+        cv2.imshow("thresh", thresh)
+        cv2.waitKey(1)
         return left_avg, center_avg, right_avg
+        
+
 
 
 
