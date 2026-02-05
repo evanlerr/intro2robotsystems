@@ -52,7 +52,7 @@ class DigiSensor(object):
         cv2.imwrite("cam_gray.png", gray)
         cv2.imwrite("cam_thresh.png", thresh)
         cv2.waitKey(1)
-        return left_avg, center_avg, right_avg
+        return right_avg, center_avg, left_avg
         
 
 
@@ -226,7 +226,7 @@ def cameraline_following():
     px.set_cam_tilt_angle(-30)
     try:
         while True:
-            clfollow_controller.control_loop(15)
+            clfollow_controller.control_loop(20)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
