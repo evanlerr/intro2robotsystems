@@ -28,13 +28,14 @@ class DigiSensor(object):
 
     def readval(self):
         frame = self.picam2.capture_array("main")  # YUV420 → 2D uint8
-        gray = frame  # already grayscale, 0–255
+        h, w = 240,320
+        gray = frame[:h,:w]
 
         threshold_value = 100
-        _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY_INV)
+        _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
 
         h, w = thresh.shape
-        rows = slice(h-10, h)
+        rows = slice(h-25, h)
         center_size = 70
         cx = w // 2
 
@@ -86,7 +87,8 @@ class controller(object):
         self.time_over_line = 0
 
     def control_loop(self,gain):
-        values = self.interpreter.state(self.sensor.readval())
+        raw = self.sensor.readval()
+        values = self.interpreter.state(raw)
         print(f"raw vals: {self.sensor.readval()},output value: {values}, {self.over_left}, {self.over_right}, {self.time_over_line}")
         self.gain = gain
         Ldist = values[0]
@@ -153,7 +155,7 @@ px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale)
 sensevis = DigiSensor()
 interpret = interpreter(dark=200, light=800, polarity="dark")
-interpret_table = interpreter(dark=700, light=1050, polarity="dark") # todo - add a threshold to make the image binary
+interpret_table = interpreter(dark=255, light=0, polarity="dark") # todo - add a threshold to make the image binary
 gsfollow_controller = controller(30,sensegs,interpret)
 clfollow_controller = controller(30,sensevis,interpret_table)
 
@@ -217,7 +219,7 @@ def cameraline_following():
     px.set_cam_tilt_angle(-30)
     try:
         while True:
-            clfollow_controller.control_loop(50)
+            clfollow_controller.control_loop(15)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
