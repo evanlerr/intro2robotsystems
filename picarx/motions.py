@@ -32,7 +32,7 @@ class DigiSensor(object):
         h, w = 240,320
         gray = frame[:h,:w]
 
-        threshold_value = 120
+        threshold_value = 130
         _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY_INV)
 
         h, w = thresh.shape
