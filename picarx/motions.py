@@ -5,16 +5,21 @@ from picamera2 import Picamera2, Preview
 #from sim_robot_hat import Greyscale_Module
 import time
 import concurrent.futures
+from readerwriterlock import rwlock
 
 class Bus(object):
     def __init__(self):
         self.data = {}
+        self.lock = rwlock.RWLockWriteD()
+
 
     def write(self, key, value):
-        self.data[key] = value
+        with self.lock.gen_wlock():
+            self.data[key] = value
 
     def read(self, key):
-        return self.data.get(key, None)
+        with self.lock.gen_rlock():
+            return self.data.get(key, None)
 
 class Sensor(object):
     def __init__(self,pins,sensor):
