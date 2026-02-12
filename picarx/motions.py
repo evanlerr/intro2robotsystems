@@ -22,15 +22,17 @@ class Bus(object):
             return self.data.get(key, None)
 
 class Sensor(object):
-    def __init__(self,pins,sensor,bus):
+    def __init__(self,pins,sensor,bus,delay=0.05):
         self.pins = pins
         self.sensor = sensor
         self.bus = bus
+        self.delay = delay
 
     def readval(self):
         while True:
             self.valouts = self.sensor.read()
             self.bus.write("sensor", self.valouts)
+            time.sleep(self.delay)
     
 class DigiSensor(object):
     def __init__(self,bus,delay=0.05):
@@ -145,7 +147,9 @@ class controller(object):
         while True:
 
             values = self.bus.read("state") # wait for new state to be available
-
+            if values is None:
+                time.sleep(self.delay)
+                continue
             #raw = self.sensor.readval()
             #values = self.interpreter.state(raw)
             print(f"output value: {values}, {self.over_left}, {self.over_right}, {self.time_over_line}")
