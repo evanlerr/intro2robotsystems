@@ -248,10 +248,12 @@ def parallel_park():
 def gsline_following():
     try:
         while True:
-            with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.submit(sensegs.readval)
                 executor.submit(interpret.state)
                 executor.submit(gsfollow_controller.control_loop)
+                while True:
+                    time.sleep(1)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
@@ -263,10 +265,12 @@ def cameraline_following():
     px.set_cam_tilt_angle(-30)
     try:
         while True:
-            with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.submit(sensevis.readval)
                 executor.submit(interpret.state)
                 executor.submit(clfollow_controller.control_loop)
+                while True:
+                    time.sleep(1)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
