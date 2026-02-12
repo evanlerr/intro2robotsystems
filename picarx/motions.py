@@ -224,11 +224,11 @@ state_bus = Bus()
 
 px = Picarx()
 sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
-sensevis = DigiSensor(sensor_bus,delay=0.05)
-interpret = interpreter(dark=200, light=800, inbus = sensor_bus, outbus = state_bus, polarity="dark") # todo - add a threshold to make the image binary
-interpret_table = interpreter(dark=255, light=0, polarity="dark",inbus=sensor_bus,outbus=state_bus) # todo - add a threshold to make the image binary
-gsfollow_controller = controller(1,state_bus,delay=0.05)
-clfollow_controller = controller(40,state_bus,delay=0.05)
+sensevis = DigiSensor(sensor_bus,delay=0.02)
+interpret = interpreter(dark=200, light=800, inbus = sensor_bus, outbus = state_bus, polarity="dark", delay=0.02) # todo - add a threshold to make the image binary
+interpret_table = interpreter(dark=255, light=0, polarity="dark",inbus=sensor_bus,outbus=state_bus, delay=0.02) # todo - add a threshold to make the image binary
+gsfollow_controller = controller(1,state_bus,delay=0.02)
+clfollow_controller = controller(40,state_bus,delay=0.02)
 
 def vector(angle, speed):
     px.set_dir_servo_angle(angle)
