@@ -22,13 +22,15 @@ class Bus(object):
             return self.data.get(key, None)
 
 class Sensor(object):
-    def __init__(self,pins,sensor):
+    def __init__(self,pins,sensor,bus):
         self.pins = pins
         self.sensor = sensor
+        self.bus = bus
 
     def readval(self):
-        self.valouts = self.sensor.read()
-        return self.valouts
+        while True:
+            self.valouts = self.sensor.read()
+            self.bus.write("sensor", self.valouts)
     
 class DigiSensor(object):
     def __init__(self,bus,delay=0.05):
@@ -42,6 +44,8 @@ class DigiSensor(object):
         #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
         self.picam2.set_controls({"AeEnable": True, "AwbEnable": False})
         time.sleep(2)  # Allow camera to warm up
+        self.bus = bus
+        self.delay = delay
 
     def readval(self):
         while True:
@@ -69,8 +73,26 @@ class DigiSensor(object):
             cv2.imwrite("cam_gray.png", gray)
             cv2.imwrite("cam_thresh.png", thresh)
             #cv2.waitKey(1)
-            bus.write("sensor", (left_avg, center_avg, right_avg))
-            time.sleep(delay)
+            self.bus.write("sensor", (left_avg, center_avg, right_avg))
+            time.sleep(self.delay)
+
+    def calibrate(self):
+        frame = self.picam2.capture_array("main")
+        h, w = 240, 320
+        gray = frame[:h, :w]
+        threshold_value = 130
+        _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY_INV)
+        h, w = thresh.shape
+        rows = slice(h-25, h)
+        center_size = 70
+        cx = w // 2
+        center_region = thresh[rows, cx - center_size//2 : cx + center_size//2]
+        left_region   = thresh[rows, cx - center_size//2 - 100 : cx - center_size//2]
+        right_region  = thresh[rows, cx + center_size//2 : cx + center_size//2 +100]
+        left_avg   = int(left_region.mean())
+        center_avg = int(center_region.mean())
+        right_avg  = int(right_region.mean())
+        return (left_avg, center_avg, right_avg)
 
 
     
@@ -87,6 +109,10 @@ class interpreter(object):
         while True:
 
             vals = self.inbus.read("sensor")
+
+            if vals is None:
+                time.sleep(self.delay)
+                continue
             Lval = vals[0]
             Cval = vals[1]
             Rval = vals[2]
@@ -193,7 +219,7 @@ sensor_bus = Bus()
 state_bus = Bus()
 
 px = Picarx()
-sensegs = Sensor(px.grayscale.pins,px.grayscale)
+sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
 sensevis = DigiSensor(sensor_bus,delay=0.05)
 interpret = interpreter(dark=200, light=800, inbus = sensor_bus, outbus = state_bus, polarity="dark") # todo - add a threshold to make the image binary
 interpret_table = interpreter(dark=255, light=0, polarity="dark",inbus=sensor_bus,outbus=state_bus) # todo - add a threshold to make the image binary
@@ -280,5 +306,5 @@ def cameraline_calibrate():
     px.set_cam_pan_angle(0)
     px.set_cam_tilt_angle(-30)
     time.sleep(2)
-    vals = sensevis.readval()
+    vals = sensevis.calibrate()
     print(f"Camera line following calibration values: {vals}")
