@@ -247,7 +247,6 @@ def parallel_park():
 
 def gsline_following():
     try:
-        while True:
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.submit(sensegs.readval)
                 executor.submit(interpret.state)
@@ -264,7 +263,6 @@ def cameraline_following():
     px.set_cam_pan_angle(0)
     px.set_cam_tilt_angle(-30)
     try:
-        while True:
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.submit(sensevis.readval)
                 executor.submit(interpret.state)
