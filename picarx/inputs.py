@@ -24,7 +24,8 @@ while True:
     if request == "q":
         print("exiting...")
         break
-
+    if request in maneuvers:
+        maneuvers[request]()
     if request[0] == "f":
         if request[1] == "l":
             angle = -int(request[2:4])
@@ -41,9 +42,5 @@ while True:
         speed = -int(request[4:])
         vector(angle, speed)
         continue
-
-
-    if request in maneuvers:
-        maneuvers[request]()
     else:
         print("not a valid command")
