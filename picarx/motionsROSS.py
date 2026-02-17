@@ -62,6 +62,7 @@ def camera_sensor_function():
     return (left_avg, center_avg, right_avg)
 
 def interpret_function(vals):
+    print(f"non-Interpreted sensor values: {vals}\n")
     if vals is None:
         return None
     dark = 200
@@ -81,6 +82,7 @@ def interpret_function(vals):
     return (Ldist,Cdist,Rdist)
 
 def controller_function(statevals):
+    print(f"non-Controlled state values: {statevals}\n")
     if statevals is None:
         return
     global left_count, right_count, over_left, over_right, time_over_line
