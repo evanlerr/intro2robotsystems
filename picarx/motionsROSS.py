@@ -8,7 +8,8 @@ import concurrent.futures
 from readerwriterlock import rwlock
 from rossros import Bus, Producer, ConsumerProducer, Consumer, runConcurrently
 
-px = Picarx()
+#px = Picarx()
+from motions import px
 initcomplete = False
 left_count = 0
 right_count = 0
