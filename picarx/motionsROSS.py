@@ -60,6 +60,8 @@ def camera_sensor_function():
     return (left_avg, center_avg, right_avg)
 
 def interpret_function(vals):
+    if vals is None:
+        return None
     dark = 200
     light = 800
     polarity = "dark"
@@ -77,6 +79,8 @@ def interpret_function(vals):
     return (Ldist,Cdist,Rdist)
 
 def controller_function(statevals):
+    if statevals is None:
+        return
     global left_count, right_count, over_left, over_right, time_over_line
 
     gain = 1
@@ -154,9 +158,9 @@ state_bus = Bus()
 # gsfollow_controller = controller(1,state_bus,delay=0.02)
 # clfollow_controller = controller(40,state_bus,delay=0.02)
 
-sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=int(0.05), name="GrayscaleSensor")
-interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=int(0.05), name="Interpreter")
-controller = Consumer(controller_function, input_buses=state_bus, delay=int(0.05), name="Controller")
+sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
+interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
+controller = Consumer(controller_function, input_buses=state_bus, delay=0.05, name="Controller")
 
 def vector(angle, speed):
     px.set_dir_servo_angle(angle)
