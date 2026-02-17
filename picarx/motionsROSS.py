@@ -4,8 +4,8 @@ from picarx_improved import Picarx
 from picamera2 import Picamera2, Preview
 #from sim_robot_hat import Greyscale_Module
 import time
-import concurrent.futures
-from readerwriterlock import rwlock
+#import concurrent.futures
+#from readerwriterlock import rwlock
 from rossros import Bus, Producer, ConsumerProducer, Consumer, runConcurrently
 
 #px = Picarx()
