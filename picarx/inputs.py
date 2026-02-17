@@ -1,5 +1,6 @@
 import picarx_improved
 from motions import vector,k_turn, parallel_park,gsline_following,cameraline_following,cameraline_calibrate
+from motionsROSS import vector as ros_vector, k_turn as ros_k_turn, parallel_park as ros_parallel_park, gsline_following as ros_gsline_following#, cameraline_following as ros_cameraline_following, cameraline_calibrate as ros_cameraline_calibrate
 import time
 
 #px = picarx_improved.Picarx()
@@ -9,8 +10,11 @@ maneuvers = {
     "k": k_turn,
     "p": parallel_park,
     "gl": gsline_following,
+    "rgl": ros_gsline_following,
     "cl": cameraline_following,
-    "ccal": cameraline_calibrate
+    #"rcl": ros_cameraline_following,
+    "ccal": cameraline_calibrate,
+    #"rccal": ros_cameraline_calibrate
 
 }
 
