@@ -77,7 +77,7 @@ def interpret_function(vals):
 
 def controller_function(statevals,statevars):
     print(f"non-Controlled state values: {statevals}\n")
-    if statevals is 0 or statevals is None:
+    if statevals is 0 or (isinstance(statevals,tuple) and all (v is 0 for v in statevals)) or statevals is None:
         print("no state values to control on")
         print("statevars: ", statevars)
         return (0, statevars)
