@@ -141,7 +141,7 @@ def controller_function(statevals,statevars):
         turn = 30
 
 
-    if Cdist < 0.2 #and time_over_line > 25:
+    if Cdist < 0.2: #and time_over_line > 25:
         px.set_dir_servo_angle(-turn)
         #px.set_cam_pan_angle(-turn)
         px.backward(20)
