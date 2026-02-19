@@ -88,7 +88,7 @@ def controller_function(statevals,statevars):
     right_count = statevars.get("right_count", 0)
     time_over_line = statevars.get("time_over_line", 0)
 
-    gain = 1
+    gain = 30
     Ldist = statevals[0]
     Cdist = statevals[1]
     Rdist = statevals[2]
