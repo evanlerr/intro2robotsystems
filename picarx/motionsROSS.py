@@ -220,6 +220,10 @@ def parallel_park():
     px.set_dir_servo_angle(0)
 
 def gsline_following():
+    try:
+        picam2.stop()
+    except Exception:
+        pass
     config = picam2.create_still_configuration(main={
     "size": (320, 240), 
     "format": "YUV420"
