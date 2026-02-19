@@ -141,7 +141,7 @@ def controller_function(statevals,statevars):
         turn = 30
 
 
-    if Cdist < 0.2 and time_over_line > 25:
+    if Cdist < 0.2 #and time_over_line > 25:
         px.set_dir_servo_angle(-turn)
         #px.set_cam_pan_angle(-turn)
         px.backward(20)
@@ -237,9 +237,9 @@ def gsline_following():
     picam2.set_controls({"AeEnable": True, "AwbEnable": False})
 
 
-    sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
-    interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
-    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(state_var_bus),delay=0.05,name="Controller")
+    sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.02, name="GrayscaleSensor")
+    interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.02, name="Interpreter")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(state_var_bus),delay=0.02,name="Controller")
 
     try:
         runConcurrently([sensor, interpreter, controller])
