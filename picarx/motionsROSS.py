@@ -79,7 +79,8 @@ def controller_function(statevals,statevars):
     print(f"non-Controlled state values: {statevals}\n")
     if statevals is 0 or statevals is None:
         print("no state values to control on")
-        return None,statevars
+        print("statevars: ", statevars)
+        return
     
     over_left = statevars.get("over_left", False)
     over_right = statevars.get("over_right", False)
