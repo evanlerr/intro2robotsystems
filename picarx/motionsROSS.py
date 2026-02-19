@@ -58,6 +58,7 @@ def interpret_function(vals):
     print(f"non-Interpreted sensor values: {vals}\n")
     if vals is 0 or vals is None:
         print("no sensor values to interpret")
+        return (0,0,0)
         #return None
     dark = 200
     light = 800
