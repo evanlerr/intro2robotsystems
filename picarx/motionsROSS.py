@@ -77,7 +77,7 @@ def interpret_function(vals):
 def controller_function(statevals,statevars):
     print(f"non-Controlled state values: {statevals}\n")
     if statevals is None:
-        return
+        return None,statevars
     
     over_left = statevars.get("over_left", False)
     over_right = statevars.get("over_right", False)
