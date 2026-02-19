@@ -159,7 +159,7 @@ def controller_function(statevals,statevars):
         "time_over_line": time_over_line
     }
 
-    return None,new_statevars
+    return new_statevars
 
 sensor_bus = Bus()
 state_bus = Bus()
@@ -238,7 +238,7 @@ def gsline_following():
 
     sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
     interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
-    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(None, state_var_bus),delay=0.05,name="Controller")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(state_var_bus),delay=0.05,name="Controller")
 
     try:
         runConcurrently([sensor, interpreter, controller])
