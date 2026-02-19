@@ -18,19 +18,19 @@ def grayscale_sensor_function():
     print(f"Grayscale sensor values: {vals}\n")
     return vals
 
-def camera_init():
-        global picam2
-        picam2 = Picamera2()
-        config = picam2.create_still_configuration(main={
-            "size": (320, 240), 
-            "format": "YUV420"
-            })
-        picam2.configure(config)
-        picam2.start()
-        #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
-        picam2.set_controls({"AeEnable": True, "AwbEnable": False})
-        global initcomplete
-        initcomplete = True
+# def camera_init():
+#         global picam2
+#         picam2 = Picamera2()
+#         config = picam2.create_still_configuration(main={
+#             "size": (320, 240), 
+#             "format": "YUV420"
+#             })
+#         picam2.configure(config)
+#         picam2.start()
+#         #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
+#         picam2.set_controls({"AeEnable": True, "AwbEnable": False})
+#         global initcomplete
+#         initcomplete = True
 
 def camera_sensor_function():
     frame = picam2.capture_array("main")  # YUV420
@@ -168,7 +168,22 @@ state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "l
 # interpret_table = interpreter(dark=255, light=0, polarity="dark",inbus=sensor_bus,outbus=state_bus, delay=0.02) # todo - add a threshold to make the image binary
 # gsfollow_controller = controller(1,state_bus,delay=0.02)
 # clfollow_controller = controller(40,state_bus,delay=0.02)
-camera_init()
+
+#camera_init()
+
+global picam2
+picam2 = Picamera2()
+config = picam2.create_still_configuration(main={
+    "size": (320, 240), 
+    "format": "YUV420"
+    })
+picam2.configure(config)
+picam2.start()
+#self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
+picam2.set_controls({"AeEnable": True, "AwbEnable": False})
+global initcomplete
+initcomplete = True
+
 sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
 interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
 controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(None, state_var_bus),delay=0.05,name="Controller")
