@@ -35,8 +35,8 @@ class Sensor(object):
             time.sleep(self.delay)
     
 class DigiSensor(object):
-    def __init__(self,bus,delay=0.05):
-        self.picam2 = Picamera2()
+    def __init__(self,bus,delay=0.05,picam2=None):
+        self.picam2 = picam2
         config = self.picam2.create_still_configuration(main={
             "size": (320, 240), 
             "format": "YUV420"
@@ -223,9 +223,9 @@ sensor_bus = Bus()
 state_bus = Bus()
 
 px = Picarx()
-#picam2 = Picamera2()
+picam2 = Picamera2()
 sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
-sensevis = DigiSensor(sensor_bus,delay=0.02)
+sensevis = DigiSensor(sensor_bus,delay=0.02,picam2=picam2)
 interpret = interpreter(dark=200, light=800, inbus = sensor_bus, outbus = state_bus, polarity="dark", delay=0.02) # todo - add a threshold to make the image binary
 interpret_table = interpreter(dark=255, light=0, polarity="dark",inbus=sensor_bus,outbus=state_bus, delay=0.02) # todo - add a threshold to make the image binary
 gsfollow_controller = controller(1,state_bus,delay=0.02)
