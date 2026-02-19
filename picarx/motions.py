@@ -223,7 +223,7 @@ sensor_bus = Bus()
 state_bus = Bus()
 
 px = Picarx()
-picam2 = Picamera2()
+#picam2 = Picamera2()
 sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
 sensevis = DigiSensor(sensor_bus,delay=0.02)
 interpret = interpreter(dark=200, light=800, inbus = sensor_bus, outbus = state_bus, polarity="dark", delay=0.02) # todo - add a threshold to make the image binary

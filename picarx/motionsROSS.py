@@ -15,7 +15,6 @@ from motions import picam2
 
 
 def grayscale_sensor_function():
-    global px
     vals = px.grayscale.read()
     print(f"Grayscale sensor values: {vals}\n")
     return vals
