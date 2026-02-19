@@ -171,7 +171,7 @@ state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "l
 
 #camera_init()
 
-global picam2
+#global picam2
 picam2 = Picamera2()
 config = picam2.create_still_configuration(main={
     "size": (320, 240), 
