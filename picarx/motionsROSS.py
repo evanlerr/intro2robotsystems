@@ -10,6 +10,7 @@ from rossros import Bus, Producer, ConsumerProducer, Consumer, runConcurrently
 
 #px = Picarx()
 from motions import px
+from motions import picam2
 
 
 def grayscale_sensor_function():
@@ -172,7 +173,7 @@ state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "l
 #camera_init()
 
 #global picam2
-picam2 = Picamera2()
+
 config = picam2.create_still_configuration(main={
     "size": (320, 240), 
     "format": "YUV420"
@@ -181,8 +182,6 @@ picam2.configure(config)
 picam2.start()
 #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
 picam2.set_controls({"AeEnable": True, "AwbEnable": False})
-global initcomplete
-initcomplete = True
 
 sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
 interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
