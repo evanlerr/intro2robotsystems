@@ -56,7 +56,7 @@ def camera_sensor_function():
 
 def interpret_function(vals):
     print(f"non-Interpreted sensor values: {vals}\n")
-    if vals is None:
+    if vals is 0 or vals is None:
         print("no sensor values to interpret")
         return (0,0,0)
     dark = 200
@@ -77,7 +77,7 @@ def interpret_function(vals):
 
 def controller_function(statevals,statevars):
     print(f"non-Controlled state values: {statevals}\n")
-    if statevals is None:
+    if statevals is 0 or statevals is None:
         print("no state values to control on")
         return None,statevars
     
