@@ -10,12 +10,6 @@ from rossros import Bus, Producer, ConsumerProducer, Consumer, runConcurrently
 
 #px = Picarx()
 from motions import px
-initcomplete = False
-left_count = 0
-right_count = 0
-over_left = False
-over_right = False
-time_over_line = 0
 
 
 def grayscale_sensor_function():
@@ -39,8 +33,6 @@ def camera_init():
         initcomplete = True
 
 def camera_sensor_function():
-    if not initcomplete:
-        camera_init()
     frame = picam2.capture_array("main")  # YUV420
     h, w = 240,320
     gray = frame[:h,:w]
@@ -81,11 +73,16 @@ def interpret_function(vals):
         Rdist = 1 - Rdist
     return (Ldist,Cdist,Rdist)
 
-def controller_function(statevals):
+def controller_function(statevals,statevars):
     print(f"non-Controlled state values: {statevals}\n")
     if statevals is None:
         return
-    global left_count, right_count, over_left, over_right, time_over_line
+    
+    over_left = statevars.get("over_left", False)
+    over_right = statevars.get("over_right", False)
+    left_count = statevars.get("left_count", 0)
+    right_count = statevars.get("right_count", 0)
+    time_over_line = statevars.get("time_over_line", 0)
 
     gain = 1
     Ldist = statevals[0]
@@ -151,9 +148,19 @@ def controller_function(statevals):
         px.forward(20)
         time.sleep(.05)
 
+    new_statevars = {
+        "over_left": over_left,
+        "over_right": over_right,
+        "left_count": left_count,
+        "right_count": right_count,
+        "time_over_line": time_over_line
+    }
+
+    return None,new_statevars
 
 sensor_bus = Bus()
 state_bus = Bus()
+state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
 # sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
 # sensevis = DigiSensor(sensor_bus,delay=0.02)
@@ -161,10 +168,10 @@ state_bus = Bus()
 # interpret_table = interpreter(dark=255, light=0, polarity="dark",inbus=sensor_bus,outbus=state_bus, delay=0.02) # todo - add a threshold to make the image binary
 # gsfollow_controller = controller(1,state_bus,delay=0.02)
 # clfollow_controller = controller(40,state_bus,delay=0.02)
-
+camera_init()
 sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
 interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
-controller = Consumer(controller_function, input_buses=state_bus, delay=0.05, name="Controller")
+controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(None, state_var_bus),delay=0.05,name="Controller")
 
 def vector(angle, speed):
     px.set_dir_servo_angle(angle)
