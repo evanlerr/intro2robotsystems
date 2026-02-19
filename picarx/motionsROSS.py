@@ -58,7 +58,7 @@ def interpret_function(vals):
     print(f"non-Interpreted sensor values: {vals}\n")
     if vals is 0 or vals is None:
         print("no sensor values to interpret")
-        return None
+        #return None
     dark = 200
     light = 800
     polarity = "dark"
@@ -77,10 +77,10 @@ def interpret_function(vals):
 
 def controller_function(statevals,statevars):
     print(f"non-Controlled state values: {statevals}\n")
-    # if statevals is 0 or (isinstance(statevals,tuple) and all (v is 0 for v in statevals)) or statevals is None:
-    #     print("no state values to control on")
-    #     print("statevars: ", statevars)
-    #     return (0, statevars)
+    if statevals is 0 or (isinstance(statevals,tuple) and all (v is 0 for v in statevals)) or statevals is None:
+        print("no state values to control on")
+        print("statevars: ", statevars)
+        return (0, statevars)
     over_left = statevars.get("over_left", False)
     over_right = statevars.get("over_right", False)
     left_count = statevars.get("left_count", 0)
