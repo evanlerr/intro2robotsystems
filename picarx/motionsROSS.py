@@ -1,4 +1,5 @@
 import sys,os,picarx_improved,cv2
+from sim_robot_hat import config
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from picarx_improved import Picarx
 from picamera2 import Picamera2, Preview
@@ -174,19 +175,6 @@ state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "l
 
 #global picam2
 
-config = picam2.create_still_configuration(main={
-    "size": (320, 240), 
-    "format": "YUV420"
-    })
-picam2.configure(config)
-picam2.start()
-#self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
-picam2.set_controls({"AeEnable": True, "AwbEnable": False})
-
-sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
-interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
-controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(None, state_var_bus),delay=0.05,name="Controller")
-
 def vector(angle, speed):
     px.set_dir_servo_angle(angle)
     if speed >= 0:
@@ -233,6 +221,20 @@ def parallel_park():
     px.set_dir_servo_angle(0)
 
 def gsline_following():
+    config = picam2.create_still_configuration(main={
+    "size": (320, 240), 
+    "format": "YUV420"
+    })
+    picam2.configure(config)
+    picam2.start()
+    #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
+    picam2.set_controls({"AeEnable": True, "AwbEnable": False})
+
+
+    sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.05, name="GrayscaleSensor")
+    interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.05, name="Interpreter")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(None, state_var_bus),delay=0.05,name="Controller")
+
     try:
         runConcurrently([sensor, interpreter, controller])
     except KeyboardInterrupt:
