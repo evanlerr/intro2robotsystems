@@ -80,7 +80,7 @@ def controller_function(statevals,statevars):
     if statevals is 0 or statevals is None:
         print("no state values to control on")
         print("statevars: ", statevars)
-        return
+        return (None, statevars)
     
     over_left = statevars.get("over_left", False)
     over_right = statevars.get("over_right", False)
