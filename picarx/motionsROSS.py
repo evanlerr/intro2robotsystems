@@ -13,6 +13,10 @@ from rossros import Bus, Producer, ConsumerProducer, Consumer, runConcurrently
 from motions import px
 from motions import picam2
 
+def ultrasonic_sensor_function():
+    vals2 = px.ultrasonic.read()
+    print(f"Ultrasonic sensor value: {vals2}\n")
+    return vals2
 
 def grayscale_sensor_function():
     vals = px.grayscale.read()
@@ -76,7 +80,7 @@ def interpret_function(vals):
         Rdist = 1 - Rdist
     return (Ldist,Cdist,Rdist)
 
-def controller_function(statevals,statevars):
+def controller_function(statevals,statevars,ultrasonic_vals):
     print(f"non-Controlled state values: {statevals}\n")
     if statevals is 0 or (isinstance(statevals,tuple) and all (v is 0 for v in statevals)) or statevals is None:
         print("no state values to control on")
@@ -92,7 +96,8 @@ def controller_function(statevals,statevars):
     Ldist = statevals[0]
     Cdist = statevals[1]
     Rdist = statevals[2]
-    turn = 0
+    # Expect ultrasonic value as fourth element in statevals, or None
+    ultrasonic_val = ultrasonic_vals if ultrasonic_vals is not None else None
 
     left_on_line  = (Ldist > 0.8) and (Ldist > Rdist)
     right_on_line = (Rdist > 0.8) and (Rdist > Ldist)
@@ -118,14 +123,11 @@ def controller_function(statevals,statevars):
     else:
         right_count = 0
 
-    
-
     if not (over_left or over_right):
         if left_count >= CONFIRM and not over_right:
             over_left = True
         elif right_count >= CONFIRM and not over_left:
             over_right = True
-
 
     if over_left or over_right:
         time_over_line += 1
@@ -140,17 +142,23 @@ def controller_function(statevals,statevars):
     if over_right:
         turn = 30
 
-
-    if Cdist < 0.2 and time_over_line > 25:
-        px.set_dir_servo_angle(-turn)
-        #px.set_cam_pan_angle(-turn)
-        px.backward(20)
-        time.sleep(.4)
+    print(f"Ultrasonic sensor value (controller): {ultrasonic_val}")
+    obstacle_threshold = 15  # cm, adjust as needed
+    if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
+        print("Obstacle detected! Stopping movement.")
+        px.stop()
+        time.sleep(0.2)
     else:
-        px.set_dir_servo_angle(turn)
-        #px.set_cam_pan_angle(turn)
-        px.forward(20)
-        time.sleep(.05)
+        if Cdist < 0.2 and time_over_line > 25:
+            px.set_dir_servo_angle(-turn)
+            #px.set_cam_pan_angle(-turn)
+            px.backward(20)
+            time.sleep(.4)
+        else:
+            px.set_dir_servo_angle(turn)
+            #px.set_cam_pan_angle(turn)
+            px.forward(20)
+            time.sleep(.05)
 
     new_statevars = {
         "over_left": over_left,
@@ -163,6 +171,7 @@ def controller_function(statevals,statevars):
     return new_statevars
 
 sensor_bus = Bus()
+sensor2_bus = Bus()
 state_bus = Bus()
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
@@ -238,11 +247,12 @@ def gsline_following():
 
 
     sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.02, name="GrayscaleSensor")
+    sensor2 = Producer(ultrasonic_sensor_function, output_buses=sensor2_bus, delay=0.1, name="UltrasonicSensor")
     interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.02, name="Interpreter")
-    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus),output_buses=(state_var_bus),delay=0.02,name="Controller")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus),output_buses=(state_var_bus),delay=0.02,name="Controller")
 
     try:
-        runConcurrently([sensor, interpreter, controller])
+        runConcurrently([sensor,sensor2, interpreter, controller])
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:        
