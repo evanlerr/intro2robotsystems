@@ -266,6 +266,9 @@ def mqtt_test():
         topic = "robot/time"
 
         client = mqtt.Client()
+
+        client.username_pw_set(username = "evanb", password = "iamapi")
+
         client.connect(broker_ip, 1883, 60)
 
         while True:
