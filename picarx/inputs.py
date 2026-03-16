@@ -1,11 +1,11 @@
 import picarx_improved
 from motions import vector,k_turn, parallel_park,gsline_following,cameraline_following,cameraline_calibrate
-from motionsROSS import vector as ros_vector, k_turn as ros_k_turn, parallel_park as ros_parallel_park, gsline_following as ros_gsline_following#, cameraline_following as ros_cameraline_following, cameraline_calibrate as ros_cameraline_calibrate
+from motionsROSS import vector as ros_vector, k_turn as ros_k_turn, parallel_park as ros_parallel_park, gsline_following as ros_gsline_following, mqtt_test#, cameraline_following as ros_cameraline_following, cameraline_calibrate as ros_cameraline_calibrate
 import time
 
 #px = picarx_improved.Picarx()
 
-maneuvers = {
+cmds = {
     "kl": k_turn,
     "k": k_turn,
     "p": parallel_park,
@@ -15,6 +15,7 @@ maneuvers = {
     #"rcl": ros_cameraline_following,
     "ccal": cameraline_calibrate,
     #"rccal": ros_cameraline_calibrate
+    "mqtt": mqtt_test
 
 }
 
@@ -24,8 +25,8 @@ while True:
     if request == "q":
         print("exiting...")
         break
-    if request in maneuvers:
-        maneuvers[request]()
+    if request in cmds:
+        cmds[request]()
     if request[0] == "f":
         if request[1] == "l":
             angle = -int(request[2:4])
