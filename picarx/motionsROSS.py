@@ -146,7 +146,6 @@ def controller_function(statevals,statevars,ultrasonic_vals):
     obstacle_threshold = 15  # cm, adjust as needed
     if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
         print("Obstacle detected! Stopping movement.")
-        px.stop()
         time.sleep(0.2)
     else:
         if Cdist < 0.2 and time_over_line > 25:
@@ -258,6 +257,30 @@ def gsline_following():
     finally:        
         px.stop()
         print("stop and exit")
+
+def mqtt_test():
+    try: 
+        import paho.mqtt.client as mqtt
+
+        broker_ip = "10.248.190.77"
+        topic = "robot/time"
+
+        client = mqtt.Client()
+        client.connect(broker_ip, 1883, 60)
+
+        while True:
+            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            client.publish(topic, current_time)
+            print(f"Published: {current_time}")
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt: stop and exit")
+    finally:
+        px.stop()
+        print("stop and exit")
+
+
 
 # def gsline_following():
 #     try:
