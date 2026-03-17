@@ -145,6 +145,7 @@ def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
     time_over_line = statevars.get("time_over_line", 0)
 
     drivecomm = self_busvars.get("drive_comm", 1)
+    drivecomm = 1 if drivecomm is None else drivecomm
 
     gain = 30
     Ldist = statevals[0]
