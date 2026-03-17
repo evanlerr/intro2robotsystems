@@ -315,6 +315,12 @@ def gsline_following():
         print("\nKeyboardInterrupt: stop and exit")
     finally:        
         px.stop()
+        if broker_proc is not None:
+            try:
+                if broker_proc.poll() is None:
+                    broker_proc.terminate()
+            except Exception:
+                pass
         print("stop and exit")
 
 def gsline_comms():
@@ -343,6 +349,12 @@ def gsline_comms():
         print("\nKeyboardInterrupt: stop and exit")
     finally:        
         px.stop()
+        if broker_proc is not None:
+            try:
+                if broker_proc.poll() is None:
+                    broker_proc.terminate()
+            except Exception:
+                pass
         print("stop and exit")
 
 
