@@ -13,6 +13,58 @@ from rossros import Bus, Producer, ConsumerProducer, Consumer, runConcurrently
 from motions import px
 from motions import picam2
 
+## BELOW IS MQTT SETUP CODE ## 
+broker_proc = None
+try: 
+    import socket
+    import tempfile
+    import subprocess
+    import paho.mqtt.client as mqtt
+
+    host = "0.0.0.0"
+    port = 1883
+    topic = "robot/state"
+
+    def get_local_ip():
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # No packets are sent; this only reveals the preferred outbound IP.
+            sock.connect(("8.8.8.8", 80))
+            return sock.getsockname()[0]
+        except OSError:
+            return "127.0.0.1"
+        finally:
+            sock.close()
+
+    config_text = f"""listener {port} {host}
+allow_anonymous true
+"""
+    config_file = tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False)
+    config_file.write(config_text)
+    config_file.flush()
+    config_file.close()
+
+    broker_proc = subprocess.Popen(["mosquitto", "-c", config_file.name])
+    time.sleep(1)
+
+    advertised_ip = get_local_ip()
+    print(f"MQTT broker listening on mqtt://{advertised_ip}:{port}")
+    print(f"Publishing timestamps to topic '{topic}'")
+
+    client = mqtt.Client()
+
+    client.connect("127.0.0.1", port, 60)
+
+    # while True:
+    #     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    #     client.publish(topic, current_time)
+    #     print(f"Published: {current_time}")
+    #     time.sleep(1)
+
+except FileNotFoundError:
+    print("mosquitto is not installed. Install it with: brew install mosquitto")
+
+
 def ultrasonic_sensor_function():
     vals2 = px.ultrasonic.read()
     print(f"Ultrasonic sensor value: {vals2}\n")
@@ -167,11 +219,18 @@ def controller_function(statevals,statevars,ultrasonic_vals):
         "time_over_line": time_over_line
     }
 
-    return new_statevars
+    drivevars = {}
+
+    return new_statevars,drivevars
+
+def comms_out(sensor,drive):
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    client.publish(topic, current_time)
 
 sensor_bus = Bus()
 sensor2_bus = Bus()
 state_bus = Bus()
+drive_bus = Bus()
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
 # sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
@@ -248,7 +307,7 @@ def gsline_following():
     sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.02, name="GrayscaleSensor")
     sensor2 = Producer(ultrasonic_sensor_function, output_buses=sensor2_bus, delay=0.1, name="UltrasonicSensor")
     interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.02, name="Interpreter")
-    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus),output_buses=(state_var_bus),delay=0.02,name="Controller")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus),output_buses=(state_var_bus, drive_bus),delay=0.02,name="Controller")
 
     try:
         runConcurrently([sensor,sensor2, interpreter, controller])
@@ -257,6 +316,35 @@ def gsline_following():
     finally:        
         px.stop()
         print("stop and exit")
+
+def gsline_comms():
+    try:
+        picam2.stop()
+    except Exception:
+        pass
+    config = picam2.create_still_configuration(main={
+    "size": (320, 240), 
+    "format": "YUV420"
+    })
+    picam2.configure(config)
+    picam2.start()
+    #self.picam2.set_controls({"AeEnable": False, "AwbEnable": False,"ExposureTime": 1000, "AnalogueGain": 10.0})
+    picam2.set_controls({"AeEnable": True, "AwbEnable": False})
+
+    sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.02, name="GrayscaleSensor")
+    sensor2 = Producer(ultrasonic_sensor_function, output_buses=sensor2_bus, delay=0.1, name="UltrasonicSensor")
+    interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.02, name="Interpreter")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus),output_buses=(state_var_bus, drive_bus),delay=0.02,name="Controller")
+    communicator = Consumer(comms_out,input_buses=(sensor2_bus, drive_bus), delay=0.5, name="Communicator")
+
+    try:
+        runConcurrently([sensor,sensor2, interpreter, controller, communicator])
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt: stop and exit")
+    finally:        
+        px.stop()
+        print("stop and exit")
+
 
 def mqtt_test():
     broker_proc = None

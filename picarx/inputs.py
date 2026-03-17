@@ -1,6 +1,6 @@
 import picarx_improved
 from motions import vector,k_turn, parallel_park,gsline_following,cameraline_following,cameraline_calibrate
-from motionsROSS import vector as ros_vector, k_turn as ros_k_turn, parallel_park as ros_parallel_park, gsline_following as ros_gsline_following, mqtt_test#, cameraline_following as ros_cameraline_following, cameraline_calibrate as ros_cameraline_calibrate
+from motionsROSS import vector as ros_vector, k_turn as ros_k_turn, parallel_park as ros_parallel_park, gsline_following as ros_gsline_following, mqtt_test,gsline_comms#, cameraline_following as ros_cameraline_following, cameraline_calibrate as ros_cameraline_calibrate
 import time
 
 #px = picarx_improved.Picarx()
@@ -15,7 +15,8 @@ cmds = {
     #"rcl": ros_cameraline_following,
     "ccal": cameraline_calibrate,
     #"rccal": ros_cameraline_calibrate
-    "mqtt": mqtt_test
+    "mqtt": mqtt_test,
+    "comgs": gsline_comms
 
 }
 
