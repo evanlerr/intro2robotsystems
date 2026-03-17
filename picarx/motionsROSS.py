@@ -259,17 +259,46 @@ def gsline_following():
         print("stop and exit")
 
 def mqtt_test():
+    broker_proc = None
     try: 
+        import socket
+        import tempfile
+        import subprocess
         import paho.mqtt.client as mqtt
 
-        broker_ip = "10.248.190.77"
+        host = "0.0.0.0"
+        port = 1883
         topic = "robot/time"
+
+        def get_local_ip():
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                # No packets are sent; this only reveals the preferred outbound IP.
+                sock.connect(("8.8.8.8", 80))
+                return sock.getsockname()[0]
+            except OSError:
+                return "127.0.0.1"
+            finally:
+                sock.close()
+
+        config_text = f"""listener {port} {host}
+allow_anonymous true
+"""
+        config_file = tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False)
+        config_file.write(config_text)
+        config_file.flush()
+        config_file.close()
+
+        broker_proc = subprocess.Popen(["mosquitto", "-c", config_file.name])
+        time.sleep(1)
+
+        advertised_ip = get_local_ip()
+        print(f"MQTT broker listening on mqtt://{advertised_ip}:{port}")
+        print(f"Publishing timestamps to topic '{topic}'")
 
         client = mqtt.Client()
 
-        client.username_pw_set(username = "evanb", password = "iamapi")
-
-        client.connect(broker_ip, 1883, 60)
+        client.connect("127.0.0.1", port, 60)
 
         while True:
             current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -277,9 +306,17 @@ def mqtt_test():
             print(f"Published: {current_time}")
             time.sleep(1)
 
+    except FileNotFoundError:
+        print("mosquitto is not installed. Install it with: brew install mosquitto")
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt: stop and exit")
     finally:
+        if broker_proc is not None:
+            try:
+                if broker_proc.poll() is None:
+                    broker_proc.terminate()
+            except Exception:
+                pass
         px.stop()
         print("stop and exit")
 
