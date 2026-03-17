@@ -132,7 +132,7 @@ def interpret_function(vals):
         Rdist = 1 - Rdist
     return (Ldist,Cdist,Rdist)
 
-def controller_function(statevals,statevars,ultrasonic_vals):
+def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
     print(f"non-Controlled state values: {statevals}\n")
     if statevals is 0 or (isinstance(statevals,tuple) and all (v is 0 for v in statevals)) or statevals is None:
         print("no state values to control on")
@@ -143,6 +143,8 @@ def controller_function(statevals,statevars,ultrasonic_vals):
     left_count = statevars.get("left_count", 0)
     right_count = statevars.get("right_count", 0)
     time_over_line = statevars.get("time_over_line", 0)
+
+    drivecomm = self_busvars.get("drive_comm", 1)
 
     gain = 30
     Ldist = statevals[0]
@@ -196,20 +198,24 @@ def controller_function(statevals,statevars,ultrasonic_vals):
 
     print(f"Ultrasonic sensor value (controller): {ultrasonic_val}")
     obstacle_threshold = 15  # cm, adjust as needed
-    if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
-        print("Obstacle detected! Stopping movement.")
-        time.sleep(0.2)
-    else:
-        if Cdist < 0.2 and time_over_line > 25:
-            px.set_dir_servo_angle(-turn)
-            #px.set_cam_pan_angle(-turn)
-            px.backward(20)
-            time.sleep(.4)
+    if not drivecomm == 1:
+        if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
+            print("Obstacle detected! Stopping movement.")
+            speed = 0
+            time.sleep(0.2)
         else:
-            px.set_dir_servo_angle(turn)
-            #px.set_cam_pan_angle(turn)
-            px.forward(20)
-            time.sleep(.05)
+            if Cdist < 0.2 and time_over_line > 25:
+                px.set_dir_servo_angle(-turn)
+                #px.set_cam_pan_angle(-turn)
+                px.backward(20)
+                time.sleep(.4)
+                speed = -20
+            else:
+                px.set_dir_servo_angle(turn)
+                #px.set_cam_pan_angle(turn)
+                px.forward(20)
+                time.sleep(.05)
+                speed = 20
 
     new_statevars = {
         "over_left": over_left,
@@ -219,18 +225,65 @@ def controller_function(statevals,statevars,ultrasonic_vals):
         "time_over_line": time_over_line
     }
 
-    drivevars = {}
+    drivevars = {"turn": turn, "speed": speed}
 
     return new_statevars,drivevars
 
-def comms_out(sensor,drive):
+def comms_out(self_busvars,sensor,drive):
+
+    ultrasonic_val = sensor if sensor is not None else None
+    turn = drive.get("turn", 0) if drive is not None else 0
+    speed = drive.get("speed", 0) if drive is not None else 0
+
+    stoptime = self_busvars.get("stoptime", 0)
+
+    drivecomm = 1
+
+    if speed == 0:
+        stoptime += 1
+        if stoptime > 6:
+            vicstate = 1 
+    else:
+        stoptime = 0
+        vicstate = 0
+    
+    if vicstate == 1:
+        armdist = ultrasonic_val
+        vicstate = 2
+        armtime = 0
+    
+    if vicstate == 2:
+        armtime = armtime + 1
+        if armdist is not None and ultrasonic_val is not None and armdist < 20:
+            if armtime > 2 and ultrasonic_val < armdist:
+                vicstate = 3
+    
+    if vicstate == 3:
+        drivecomm = 0
+        time.sleep(3)
+        vicstate = 0
+        stoptime = 0
+        armtime = 0
+        armdist = None
+        drivecomm = 1
+
+
     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    client.publish(topic, current_time)
+    client.publish(topic, vicstate)
+
+    self_busvarsnew = {
+        "stoptime": stoptime,
+        "armdist": armdist,
+        "drive_comm": drivecomm
+    }
+
+    return self_busvarsnew
 
 sensor_bus = Bus()
 sensor2_bus = Bus()
 state_bus = Bus()
 drive_bus = Bus()
+self_bus = Bus()
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
 # sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
@@ -340,8 +393,8 @@ def gsline_comms():
     sensor = Producer(grayscale_sensor_function, output_buses=sensor_bus, delay=0.02, name="GrayscaleSensor")
     sensor2 = Producer(ultrasonic_sensor_function, output_buses=sensor2_bus, delay=0.1, name="UltrasonicSensor")
     interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.02, name="Interpreter")
-    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus),output_buses=(state_var_bus, drive_bus),delay=0.02,name="Controller")
-    communicator = Consumer(comms_out,input_buses=(sensor2_bus, drive_bus), delay=0.5, name="Communicator")
+    controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus,self_bus),output_buses=(state_var_bus, drive_bus),delay=0.02,name="Controller")
+    communicator = ConsumerProducer(comms_out,input_buses=(self_bus ,sensor2_bus, drive_bus),output_buses=self_bus, delay=0.5, name="Communicator")
 
     try:
         runConcurrently([sensor,sensor2, interpreter, controller, communicator])
