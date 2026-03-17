@@ -51,7 +51,7 @@ allow_anonymous true
     print(f"MQTT broker listening on mqtt://{advertised_ip}:{port}")
     print(f"Publishing timestamps to topic '{topic}'")
 
-    # client = mqtt.Client()
+    client = mqtt.Client()
 
     # client.connect("127.0.0.1", port, 60) # IF YOU NEED TO LOCALLY CONNECT
 
