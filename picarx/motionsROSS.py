@@ -248,7 +248,7 @@ def comms_out(self_busvars,sensor,drive):
         drivecomm = self_busvars.get("drive_comm", 1) if self_busvars is not None else 1
         vicstate = self_busvars.get("vicstate", 0) if self_busvars is not None else 0
         armtime = self_busvars.get("armtime", 0) if self_busvars is not None else 0
-
+        print(f"\n CURRENT VEHICLE STATE: {vicstate}, stoptime: {stoptime}, armdist: {armdist}, drivecomm: {drivecomm}, armtime: {armtime}, ultrasonic_val: {ultrasonic_val}, speed: {speed}\n ")
         if vicstate == 3:
             drivecomm = 0
             time.sleep(4)
