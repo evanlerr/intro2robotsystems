@@ -234,9 +234,11 @@ def comms_out(self_busvars,sensor,drive):
     print("communicator output function called")
     ultrasonic_val = sensor if sensor is not None else None
     turn = drive.get("turn", 0) if drive is not None else 0
-    speed = drive.get("speed", 0) if drive is not None else 0
+    speed = drive.get("speed", 0) if drive is not None else 1
 
-    stoptime = self_busvars.get("stoptime", 0)
+    stoptime = self_busvars.get("stoptime", 0) if self_busvars is not None else 0
+    armdist = self_busvars.get("armdist", None) if self_busvars is not None else None
+    drivecomm = self_busvars.get("drive_comm", 1) if self_busvars is not None else 1
 
     drivecomm = 1
 
