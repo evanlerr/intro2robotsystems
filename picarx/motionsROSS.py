@@ -263,7 +263,8 @@ def comms_out(self_busvars,sensor,drive):
                     vicstate = 3
 
         if vicstate == 1:
-            armdist = ultrasonic_val
+            if armdist is None:
+                armdist = ultrasonic_val
             vicstate = 2
             armtime = 0
 
@@ -274,6 +275,8 @@ def comms_out(self_busvars,sensor,drive):
         else:
             stoptime = 0
             vicstate = 0
+            armdist = None
+            armtime = 0
         try:
             client.publish(topic, vicstate)
         except Exception as err:
