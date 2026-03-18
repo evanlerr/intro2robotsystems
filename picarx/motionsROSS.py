@@ -199,7 +199,7 @@ def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
 
     print(f"Ultrasonic sensor value (controller): {ultrasonic_val}")
     obstacle_threshold = 15  # cm, adjust as needed
-    if not drivecomm == 1:
+    if drivecomm == 1:
         if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
             print("Obstacle detected! Stopping movement.")
             speed = 0
@@ -280,10 +280,10 @@ def comms_out(self_busvars,sensor,drive):
 
     return self_busvarsnew
 
-sensor_bus = Bus()
-sensor2_bus = Bus()
-state_bus = Bus()
-drive_bus = Bus()
+sensor_bus = Bus(name="GrayscaleSensorBus")
+sensor2_bus = Bus(name="UltrasonicSensorBus")
+state_bus = Bus(name="StateBus")
+drive_bus = Bus(name="DriveBus")
 self_bus = Bus(initial_message={"stoptime": 0, "armdist": None, "drive_comm": 1}, name="SelfBus")
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
