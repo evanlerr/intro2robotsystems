@@ -68,6 +68,8 @@ except FileNotFoundError:
 def ultrasonic_sensor_function():
     vals2 = px.ultrasonic.read()
     print(f"Ultrasonic sensor value: {vals2}\n")
+    if vals2 == -2:
+        return 1000
     return vals2
 
 def grayscale_sensor_function():
@@ -116,7 +118,7 @@ def interpret_function(vals):
         print("no sensor values to interpret")
         return (0,0,0)
         #return None
-    dark = 300
+    dark = 100
     light = 800
     polarity = "dark"
     Lval = vals[0]
