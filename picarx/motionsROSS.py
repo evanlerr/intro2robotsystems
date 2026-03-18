@@ -271,7 +271,7 @@ def comms_out(self_busvars,sensor,drive):
 
         if speed == 0:
             stoptime += 1
-            if stoptime > 6:
+            if stoptime > 6 and vicstate == 0:
                 vicstate = 1
         else:
             stoptime = 0
