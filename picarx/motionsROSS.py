@@ -199,6 +199,7 @@ def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
 
     print(f"Ultrasonic sensor value (controller): {ultrasonic_val}")
     obstacle_threshold = 15  # cm, adjust as needed
+    speed = 0
     if drivecomm == 1:
         if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
             print("Obstacle detected! Stopping movement.")
@@ -239,8 +240,8 @@ def comms_out(self_busvars,sensor,drive):
     stoptime = self_busvars.get("stoptime", 0) if self_busvars is not None else 0
     armdist = self_busvars.get("armdist", None) if self_busvars is not None else None
     drivecomm = self_busvars.get("drive_comm", 1) if self_busvars is not None else 1
-
-    drivecomm = 1
+    vicstate = self_busvars.get("vicstate", 0) if self_busvars is not None else 0
+    armtime = self_busvars.get("armtime", 0) if self_busvars is not None else 0
 
     if speed == 0:
         stoptime += 1
@@ -271,13 +272,17 @@ def comms_out(self_busvars,sensor,drive):
         drivecomm = 1
 
 
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    client.publish(topic, vicstate)
+    try:
+        client.publish(topic, vicstate)
+    except Exception as err:
+        print(f"MQTT publish failed: {err}")
 
     self_busvarsnew = {
         "stoptime": stoptime,
         "armdist": armdist,
-        "drive_comm": drivecomm
+        "drive_comm": drivecomm,
+        "vicstate": vicstate,
+        "armtime": armtime
     }
 
     return self_busvarsnew
@@ -286,7 +291,7 @@ sensor_bus = Bus(name="GrayscaleSensorBus")
 sensor2_bus = Bus(name="UltrasonicSensorBus")
 state_bus = Bus(name="StateBus")
 drive_bus = Bus(name="DriveBus")
-self_bus = Bus(initial_message={"stoptime": 0, "armdist": None, "drive_comm": 1}, name="SelfBus")
+self_bus = Bus(initial_message={"stoptime": 0, "armdist": None, "drive_comm": 1, "vicstate": 0, "armtime": 0}, name="SelfBus")
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
 # sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
