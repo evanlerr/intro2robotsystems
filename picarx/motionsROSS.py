@@ -116,7 +116,7 @@ def interpret_function(vals):
         print("no sensor values to interpret")
         return (0,0,0)
         #return None
-    dark = 200
+    dark = 300
     light = 800
     polarity = "dark"
     Lval = vals[0]
