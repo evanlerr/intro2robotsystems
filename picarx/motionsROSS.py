@@ -232,66 +232,78 @@ def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
     return new_statevars,drivevars
 
 def comms_out(self_busvars,sensor,drive):
-    print("communicator output function called")
-    ultrasonic_val = sensor if sensor is not None else None
-    turn = drive.get("turn", 0) if drive is not None else 0
-    speed = drive.get("speed", 0) if drive is not None else 1
-
-    stoptime = self_busvars.get("stoptime", 0) if self_busvars is not None else 0
-    armdist = self_busvars.get("armdist", None) if self_busvars is not None else None
-    drivecomm = self_busvars.get("drive_comm", 1) if self_busvars is not None else 1
-    vicstate = self_busvars.get("vicstate", 0) if self_busvars is not None else 0
-    armtime = self_busvars.get("armtime", 0) if self_busvars is not None else 0
-
-    if speed == 0:
-        stoptime += 1
-        if stoptime > 6:
-            vicstate = 1 
-    else:
-        stoptime = 0
-        vicstate = 0
-    
-    if vicstate == 1:
-        armdist = ultrasonic_val
-        vicstate = 2
-        armtime = 0
-    
-    if vicstate == 2:
-        armtime = armtime + 1
-        if armdist is not None and ultrasonic_val is not None and armdist < 20:
-            if armtime > 2 and ultrasonic_val < armdist:
-                vicstate = 3
-    
-    if vicstate == 3:
-        drivecomm = 0
-        time.sleep(3)
-        vicstate = 0
-        stoptime = 0
-        armtime = 0
-        armdist = None
-        drivecomm = 1
-
-
     try:
-        client.publish(topic, vicstate)
+        loop_count = self_busvars.get("loop_count", 0) if self_busvars is not None else 0
+        loop_count += 1
+        print(f"communicator output function called ({loop_count})")
+
+        ultrasonic_val = sensor if sensor is not None else None
+        speed = drive.get("speed", 0) if isinstance(drive, dict) else 1
+
+        stoptime = self_busvars.get("stoptime", 0) if self_busvars is not None else 0
+        armdist = self_busvars.get("armdist", None) if self_busvars is not None else None
+        drivecomm = self_busvars.get("drive_comm", 1) if self_busvars is not None else 1
+        vicstate = self_busvars.get("vicstate", 0) if self_busvars is not None else 0
+        armtime = self_busvars.get("armtime", 0) if self_busvars is not None else 0
+
+        if speed == 0:
+            stoptime += 1
+            if stoptime > 6:
+                vicstate = 1
+        else:
+            stoptime = 0
+            vicstate = 0
+
+        if vicstate == 1:
+            armdist = ultrasonic_val
+            vicstate = 2
+            armtime = 0
+
+        if vicstate == 2:
+            armtime = armtime + 1
+            if armdist is not None and ultrasonic_val is not None and armdist < 20:
+                if armtime > 2 and ultrasonic_val < armdist:
+                    vicstate = 3
+
+        if vicstate == 3:
+            drivecomm = 0
+            time.sleep(3)
+            vicstate = 0
+            stoptime = 0
+            armtime = 0
+            armdist = None
+            drivecomm = 1
+
+        try:
+            client.publish(topic, vicstate)
+        except Exception as err:
+            print(f"MQTT publish failed: {err}")
+
+        return {
+            "stoptime": stoptime,
+            "armdist": armdist,
+            "drive_comm": drivecomm,
+            "vicstate": vicstate,
+            "armtime": armtime,
+            "loop_count": loop_count,
+        }
     except Exception as err:
-        print(f"MQTT publish failed: {err}")
-
-    self_busvarsnew = {
-        "stoptime": stoptime,
-        "armdist": armdist,
-        "drive_comm": drivecomm,
-        "vicstate": vicstate,
-        "armtime": armtime
-    }
-
-    return self_busvarsnew
+        print(f"comms_out crashed: {err}")
+        # Keep state loop alive even if one cycle fails.
+        return self_busvars if isinstance(self_busvars, dict) else {
+            "stoptime": 0,
+            "armdist": None,
+            "drive_comm": 1,
+            "vicstate": 0,
+            "armtime": 0,
+            "loop_count": 0,
+        }
 
 sensor_bus = Bus(name="GrayscaleSensorBus")
 sensor2_bus = Bus(name="UltrasonicSensorBus")
 state_bus = Bus(name="StateBus")
 drive_bus = Bus(name="DriveBus")
-self_bus = Bus(initial_message={"stoptime": 0, "armdist": None, "drive_comm": 1, "vicstate": 0, "armtime": 0}, name="SelfBus")
+self_bus = Bus(initial_message={"stoptime": 0, "armdist": None, "drive_comm": 1, "vicstate": 0, "armtime": 0, "loop_count": 0}, name="SelfBus")
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
 # sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
