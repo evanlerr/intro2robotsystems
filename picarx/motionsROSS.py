@@ -53,7 +53,7 @@ allow_anonymous true
 
     client = mqtt.Client()
 
-    # client.connect("127.0.0.1", port, 60) # IF YOU NEED TO LOCALLY CONNECT
+    client.connect("127.0.0.1", port, 60) # IF YOU NEED TO LOCALLY CONNECT
 
     # while True:
     #     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -231,7 +231,7 @@ def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
     return new_statevars,drivevars
 
 def comms_out(self_busvars,sensor,drive):
-
+    print("communicator output function called")
     ultrasonic_val = sensor if sensor is not None else None
     turn = drive.get("turn", 0) if drive is not None else 0
     speed = drive.get("speed", 0) if drive is not None else 0
