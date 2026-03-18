@@ -249,7 +249,7 @@ def comms_out(self_busvars,sensor,drive):
 
         if vicstate == 3:
             drivecomm = 0
-            time.sleep(3)
+            time.sleep(4)
             vicstate = 0
             stoptime = 0
             armtime = 0
@@ -265,7 +265,7 @@ def comms_out(self_busvars,sensor,drive):
         if vicstate == 1:
             if armdist is None:
                 armdist = ultrasonic_val
-                client.publish(topic, f"detected at distance: {armdist} cm")
+                #client.publish(topic, f"detected at distance: {armdist} cm")
             vicstate = 2
             armtime = 0
 
