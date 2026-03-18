@@ -262,7 +262,7 @@ def comms_out(self_busvars,sensor,drive):
         if vicstate == 2:
             armtime = armtime + 1
             if armdist is not None and ultrasonic_val is not None and armdist < 20:
-                if armtime > 2 and ultrasonic_val < armdist:
+                if armtime > 2 and ultrasonic_val < armdist-1:
                     vicstate = 3
 
         if vicstate == 1:
