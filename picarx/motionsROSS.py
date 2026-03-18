@@ -203,6 +203,7 @@ def controller_function(statevals,statevars,ultrasonic_vals,self_busvars):
     if drivecomm == 1:
         if ultrasonic_val is not None and ultrasonic_val < obstacle_threshold:
             print("Obstacle detected! Stopping movement.")
+            px.forward(0)
             speed = 0
             time.sleep(0.2)
         else:
