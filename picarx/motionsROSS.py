@@ -284,7 +284,7 @@ sensor_bus = Bus()
 sensor2_bus = Bus()
 state_bus = Bus()
 drive_bus = Bus()
-self_bus = Bus()
+self_bus = Bus(initial_message={"stoptime": 0, "armdist": None, "drive_comm": 1}, name="SelfBus")
 state_var_bus = Bus(initial_message={"over_left": False, "over_right": False, "left_count": 0, "right_count": 0, "time_over_line": 0}, name="StateVarBus")
 
 # sensegs = Sensor(px.grayscale.pins,px.grayscale,sensor_bus)
