@@ -247,25 +247,6 @@ def comms_out(self_busvars,sensor,drive):
         vicstate = self_busvars.get("vicstate", 0) if self_busvars is not None else 0
         armtime = self_busvars.get("armtime", 0) if self_busvars is not None else 0
 
-        if speed == 0:
-            stoptime += 1
-            if stoptime > 6:
-                vicstate = 1
-        else:
-            stoptime = 0
-            vicstate = 0
-
-        if vicstate == 1:
-            armdist = ultrasonic_val
-            vicstate = 2
-            armtime = 0
-
-        if vicstate == 2:
-            armtime = armtime + 1
-            if armdist is not None and ultrasonic_val is not None and armdist < 20:
-                if armtime > 2 and ultrasonic_val < armdist:
-                    vicstate = 3
-
         if vicstate == 3:
             drivecomm = 0
             time.sleep(3)
@@ -275,6 +256,24 @@ def comms_out(self_busvars,sensor,drive):
             armdist = None
             drivecomm = 1
 
+        if vicstate == 2:
+            armtime = armtime + 1
+            if armdist is not None and ultrasonic_val is not None and armdist < 20:
+                if armtime > 2 and ultrasonic_val < armdist:
+                    vicstate = 3
+
+        if vicstate == 1:
+            armdist = ultrasonic_val
+            vicstate = 2
+            armtime = 0
+
+        if speed == 0:
+            stoptime += 1
+            if stoptime > 6:
+                vicstate = 1
+        else:
+            stoptime = 0
+            vicstate = 0
         try:
             client.publish(topic, vicstate)
         except Exception as err:
