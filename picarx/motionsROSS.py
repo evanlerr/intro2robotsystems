@@ -421,7 +421,7 @@ def gsline_comms():
     sensor2 = Producer(ultrasonic_sensor_function, output_buses=sensor2_bus, delay=0.1, name="UltrasonicSensor")
     interpreter = ConsumerProducer(interpret_function, input_buses=sensor_bus, output_buses=state_bus, delay=0.02, name="Interpreter")
     controller = ConsumerProducer(controller_function,input_buses=(state_bus, state_var_bus,sensor2_bus,self_bus),output_buses=(state_var_bus, drive_bus),delay=0.02,name="Controller")
-    communicator = ConsumerProducer(comms_out,input_buses=(self_bus ,sensor2_bus, drive_bus),output_buses=self_bus, delay=1, name="Communicator")
+    communicator = ConsumerProducer(comms_out,input_buses=(self_bus ,sensor2_bus, drive_bus),output_buses=self_bus, delay=.05, name="Communicator")
 
     try:
         runConcurrently([sensor,sensor2, interpreter, controller, communicator])
